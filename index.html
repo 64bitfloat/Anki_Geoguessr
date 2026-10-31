@@ -2379,9 +2379,9 @@
      * 4. 状態管理・localStorage永続化・Anki間隔反復（SM-2ベース）
      * ========================================================================= */
     // v2: geopinning.space 準拠の問題データへ全面差し替え（旧データのキャッシュを無視するためキーを更新）
-    const STORAGE_KEY_SRS = "geoanki_jp_srs_v3";
-    const STORAGE_KEY_CUSTOM_Q = "geoanki_jp_custom_questions_v3";
-    const STORAGE_KEY_SELECTED_CATS = "geoanki_jp_selected_cats_v3";
+    const STORAGE_KEY_SRS = "geoanki_jp_srs_v4";
+    const STORAGE_KEY_CUSTOM_Q = "geoanki_jp_custom_questions_v4";
+    const STORAGE_KEY_SELECTED_CATS = "geoanki_jp_selected_cats_v4";
 
     function loadSelectedCategories() {
       try {
@@ -2533,8 +2533,12 @@
      * 5. 学習キュー構築・問題描画・回答入力制御
      * ========================================================================= */
     function getFilteredPool() {
-      if (!activeCategoryFilter) return questionsPool;
-      return questionsPool.filter((q) => q.category === activeCategoryFilter);
+      // ユーザーが選択した学習項目（selectedCategories）で必ずフィルタリング
+      let pool = questionsPool.filter((q) => selectedCategories.has(q.category));
+      if (activeCategoryFilter) {
+        pool = pool.filter((q) => q.category === activeCategoryFilter);
+      }
+      return pool;
     }
 
     function buildStudyQueue() {

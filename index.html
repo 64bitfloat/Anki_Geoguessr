@@ -1,0 +1,3170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoAnki JP | 日本視覚メタ暗記トレーナー</title>
+  <style>
+    :root {
+      --bg-base: #0b1120;
+      --bg-surface: #111827;
+      --bg-card: #1e293b;
+      --bg-card-hover: #263449;
+      --bg-elevated: #0f172a;
+      --border-subtle: #334155;
+      --border-focus: #38bdf8;
+      --text-main: #f1f5f9;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #38bdf8;
+      --accent-strong: #0284c7;
+      --accent-soft: rgba(56, 189, 248, 0.14);
+      --indigo: #818cf8;
+      --green: #10b981;
+      --green-bg: rgba(16, 185, 129, 0.18);
+      --green-border: #34d399;
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.18);
+      --red-border: #f87171;
+      --yellow: #facc15;
+      --yellow-bg: rgba(250, 204, 21, 0.12);
+      --yellow-border: #facc15;
+      --orange: #f59e0b;
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.42);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 7px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", sans-serif;
+      background: radial-gradient(circle at 15% 0%, #131f3a 0%, var(--bg-base) 55%);
+      color: var(--text-main);
+      line-height: 1.55;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+    }
+
+    /* Header */
+    .app-header {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
+    }
+
+    .brand-title {
+      font-size: 1.12rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.76rem;
+      color: var(--text-sub);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mode-select {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: 0.84rem;
+    }
+
+    .btn-ghost {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      transition: all 0.16s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+      border-color: var(--text-muted);
+    }
+
+    .kbd-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      background: rgba(30, 41, 59, 0.7);
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+    }
+
+    kbd {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+    }
+
+    /* Layout */
+    .main-container {
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 350px;
+      gap: 20px;
+      flex: 1;
+      align-items: start;
+    }
+
+    @media (max-width: 1040px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Quiz Card */
+    .quiz-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .quiz-topbar {
+      padding: 14px 20px;
+      background: rgba(15, 23, 42, 0.65);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .cat-badge {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .type-badge {
+      background: rgba(129, 140, 248, 0.14);
+      color: var(--indigo);
+      border: 1px solid rgba(129, 140, 248, 0.35);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .srs-badge {
+      font-size: 0.75rem;
+      padding: 2px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-sub);
+      background: var(--bg-card);
+    }
+
+    .srs-badge.weak {
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.45);
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    .quiz-body {
+      padding: 20px;
+    }
+
+    .question-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #f8fafc;
+    }
+
+    /* Visual Viewport */
+    .visual-stage {
+      position: relative;
+      width: 100%;
+      background: #090d16;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 18px;
+      min-height: 290px;
+      max-height: 410px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .visual-stage svg {
+      width: 100%;
+      height: auto;
+      max-height: 400px;
+      display: block;
+    }
+
+    .visual-stage img.external-photo {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      display: none;
+    }
+
+    .visual-stage img.external-photo.loaded {
+      display: block;
+    }
+
+    .visual-tools {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .visual-tool-btn {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s;
+    }
+
+    .visual-tool-btn:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--accent);
+    }
+
+    /* Answer Section */
+    .answer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .answer-instruction {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .answer-quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .selection-counter {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    /* Type A: Power Companies Grid */
+    .power-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 760px) {
+      .power-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .power-btn {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 13px 10px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.92rem;
+      transition: all 0.14s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+    }
+
+    .power-btn .power-sub {
+      font-size: 0.7rem;
+      color: var(--text-sub);
+      font-weight: 400;
+    }
+
+    .power-btn:hover:not(:disabled) {
+      background: var(--bg-card-hover);
+      border-color: #64748b;
+      transform: translateY(-1px);
+    }
+
+    .power-btn.selected {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+      color: #fff;
+    }
+
+    .power-btn.state-correct {
+      background: var(--green-bg);
+      border-color: var(--green-border);
+      box-shadow: 0 0 0 1px var(--green-border);
+      color: #ecfdf5;
+    }
+
+    .power-btn.state-wrong {
+      background: var(--red-bg);
+      border-color: var(--red-border);
+      color: #fef2f2;
+    }
+
+    .power-btn.state-missed {
+      background: var(--yellow-bg);
+      border: 2px solid var(--yellow-border);
+      color: #fefce8;
+    }
+
+    /* Type B: Regional Accordion & Prefecture Badges */
+    .regions-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .region-item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .region-item.has-selection {
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+
+    .region-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      background: rgba(30, 41, 59, 0.65);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .region-header:hover {
+      background: rgba(38, 52, 73, 0.85);
+    }
+
+    .region-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .region-chevron {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      transition: transform 0.18s ease;
+      display: inline-block;
+      width: 14px;
+    }
+
+    .region-item.open .region-chevron {
+      transform: rotate(90deg);
+    }
+
+    .region-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .region-count-pill {
+      font-size: 0.73rem;
+      color: var(--text-sub);
+      background: rgba(15, 23, 42, 0.75);
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(51, 65, 85, 0.7);
+    }
+
+    .region-count-pill.active {
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.45);
+      background: var(--accent-soft);
+    }
+
+    .btn-region-toggle {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      transition: all 0.14s;
+    }
+
+    .btn-region-toggle:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-region-toggle:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .region-body {
+      display: none;
+      padding: 12px 14px;
+      border-top: 1px solid rgba(51, 65, 85, 0.6);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .region-item.open .region-body {
+      display: flex;
+    }
+
+    /* Prefecture Checkbox Badge */
+    .pref-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-subtle);
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.12s ease;
+    }
+
+    .pref-badge:hover:not(.locked) {
+      background: var(--bg-card-hover);
+      border-color: #64748b;
+    }
+
+    .pref-badge input[type="checkbox"] {
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border: 1.5px solid var(--text-sub);
+      border-radius: 4px;
+      background: var(--bg-elevated);
+      display: grid;
+      place-items: center;
+      margin: 0;
+      pointer-events: none;
+    }
+
+    .pref-badge input[type="checkbox"]::after {
+      content: "";
+      width: 8px;
+      height: 5px;
+      border-left: 2px solid #0b1120;
+      border-bottom: 2px solid #0b1120;
+      transform: rotate(-45deg) scale(0);
+      transition: transform 0.1s ease;
+      margin-top: -1px;
+    }
+
+    .pref-badge.checked {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .pref-badge.checked input[type="checkbox"] {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .pref-badge.checked input[type="checkbox"]::after {
+      transform: rotate(-45deg) scale(1);
+    }
+
+    .pref-badge.locked {
+      cursor: default;
+    }
+
+    /* Diff Grading Visualization States */
+    .pref-badge.diff-hit {
+      background: var(--green-bg) !important;
+      border-color: var(--green-border) !important;
+      color: #ecfdf5 !important;
+      font-weight: 700;
+    }
+
+    .pref-badge.diff-hit input[type="checkbox"] {
+      background: var(--green) !important;
+      border-color: var(--green) !important;
+    }
+
+    .pref-badge.diff-extra {
+      background: var(--red-bg) !important;
+      border-color: var(--red-border) !important;
+      color: #fecaca !important;
+      font-weight: 700;
+    }
+
+    .pref-badge.diff-extra input[type="checkbox"] {
+      background: var(--red) !important;
+      border-color: var(--red) !important;
+    }
+
+    .pref-badge.diff-missed {
+      background: var(--yellow-bg) !important;
+      border: 2px solid var(--yellow-border) !important;
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.35);
+      color: #fef08a !important;
+      font-weight: 700;
+    }
+
+    .diff-tag {
+      font-size: 0.68rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .diff-hit .diff-tag {
+      background: rgba(16, 185, 129, 0.3);
+      color: #a7f3d0;
+    }
+
+    .diff-extra .diff-tag {
+      background: rgba(239, 68, 68, 0.35);
+      color: #fecaca;
+    }
+
+    .diff-missed .diff-tag {
+      background: rgba(250, 204, 21, 0.28);
+      color: #fef08a;
+    }
+
+    .diff-legend {
+      display: none;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.79rem;
+    }
+
+    .diff-legend.visible {
+      display: flex;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-swatch {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .swatch-hit {
+      background: var(--green-bg);
+      border: 1.5px solid var(--green-border);
+    }
+
+    .swatch-extra {
+      background: var(--red-bg);
+      border: 1.5px solid var(--red-border);
+    }
+
+    .swatch-missed {
+      background: var(--yellow-bg);
+      border: 2px solid var(--yellow-border);
+    }
+
+    /* Submit Bar */
+    .submit-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.32);
+      transition: all 0.16s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-submit:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    /* Result & Explanation Panel */
+    .result-panel {
+      display: none;
+      margin-top: 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      overflow: hidden;
+      animation: fadeSlideIn 0.22s ease-out;
+    }
+
+    .result-panel.visible {
+      display: block;
+    }
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-banner {
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-weight: 700;
+    }
+
+    .result-banner.correct {
+      background: rgba(16, 185, 129, 0.18);
+      border-bottom: 1px solid rgba(52, 211, 153, 0.35);
+      color: #6ee7b7;
+    }
+
+    .result-banner.incorrect {
+      background: rgba(239, 68, 68, 0.18);
+      border-bottom: 1px solid rgba(248, 113, 113, 0.35);
+      color: #fca5a5;
+    }
+
+    .result-verdict {
+      font-size: 1.08rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-content {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .correct-answer-box {
+      background: rgba(30, 41, 59, 0.65);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+    }
+
+    .box-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-sub);
+      margin-bottom: 5px;
+    }
+
+    .correct-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .correct-pill {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      color: #d1fae5;
+      padding: 3px 11px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .explanation-box {
+      background: rgba(15, 23, 42, 0.6);
+      border-left: 3px solid var(--accent);
+      padding: 11px 14px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.91rem;
+      color: #e2e8f0;
+      line-height: 1.65;
+    }
+
+    /* Anki SRS Rating Buttons */
+    .anki-section {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+    }
+
+    .anki-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 9px;
+      font-size: 0.81rem;
+      color: var(--text-sub);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .anki-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    @media (max-width: 600px) {
+      .anki-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .anki-btn {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.14s ease;
+      position: relative;
+    }
+
+    .anki-btn:hover {
+      transform: translateY(-2px);
+      background: var(--bg-card-hover);
+    }
+
+    .anki-btn.recommended {
+      box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.28);
+    }
+
+    .anki-btn.again { border-color: rgba(239, 68, 68, 0.55); }
+    .anki-btn.again:hover { background: rgba(239, 68, 68, 0.18); border-color: #ef4444; }
+    .anki-btn.again .anki-title { color: #f87171; }
+
+    .anki-btn.hard { border-color: rgba(245, 158, 11, 0.55); }
+    .anki-btn.hard:hover { background: rgba(245, 158, 11, 0.18); border-color: #f59e0b; }
+    .anki-btn.hard .anki-title { color: #fbbf24; }
+
+    .anki-btn.good { border-color: rgba(16, 185, 129, 0.55); }
+    .anki-btn.good:hover { background: rgba(16, 185, 129, 0.18); border-color: #10b981; }
+    .anki-btn.good .anki-title { color: #34d399; }
+
+    .anki-btn.easy { border-color: rgba(56, 189, 248, 0.55); }
+    .anki-btn.easy:hover { background: rgba(56, 189, 248, 0.18); border-color: #38bdf8; }
+    .anki-btn.easy .anki-title { color: #38bdf8; }
+
+    .anki-title {
+      font-weight: 800;
+      font-size: 0.93rem;
+    }
+
+    .anki-interval {
+      font-size: 0.75rem;
+      color: var(--text-main);
+    }
+
+    .anki-key {
+      font-size: 0.68rem;
+      color: var(--text-sub);
+    }
+
+    /* Queue Complete State */
+    .complete-state {
+      display: none;
+      padding: 44px 24px;
+      text-align: center;
+    }
+
+    .complete-state.visible {
+      display: block;
+    }
+
+    .complete-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    .complete-actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Sidebar Stats (Always Visible) */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 76px;
+    }
+
+    .side-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .side-card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .kpi-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 11px 12px;
+    }
+
+    .kpi-label {
+      font-size: 0.73rem;
+      color: var(--text-sub);
+      margin-bottom: 3px;
+    }
+
+    .kpi-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .srs-summary-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      text-align: center;
+      font-size: 0.74rem;
+    }
+
+    .srs-mini {
+      background: var(--bg-card);
+      padding: 6px 4px;
+      border-radius: 6px;
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+
+    .srs-mini strong {
+      display: block;
+      font-size: 0.92rem;
+    }
+
+    /* Category Accuracy List */
+    .cat-stats-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .cat-stat-item {
+      background: var(--bg-elevated);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: border-color 0.14s, background 0.14s;
+    }
+
+    .cat-stat-item:hover {
+      border-color: var(--accent);
+    }
+
+    .cat-stat-item.active-filter {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .cat-stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.79rem;
+      margin-bottom: 5px;
+      gap: 6px;
+    }
+
+    .cat-stat-name {
+      font-weight: 600;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cat-stat-rate {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 5px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0ea5e9, #10b981);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    /* Toast & Modals */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid var(--accent);
+      padding: 9px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(5px);
+      z-index: 150;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      max-width: 920px;
+      width: 100%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+    }
+
+    .modal-body {
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .zoom-stage svg,
+    .zoom-stage img {
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-sm);
+    }
+
+    textarea.json-editor {
+      width: 100%;
+      min-height: 260px;
+      background: var(--bg-elevated);
+      color: #e2e8f0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.78rem;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">JP</div>
+        <div>
+          <div class="brand-title">GeoAnki JP — 日本視覚メタ暗記トレーナー</div>
+          <div class="brand-sub">GeoGuessr / GeoPinning 7大インフラ視覚メタ 1問1答・間隔反復学習</div>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <span class="kbd-hint" title="キーボードショートカット">
+          <kbd>Space</kbd>/<kbd>Enter</kbd> 判定・次へ
+          <kbd>1</kbd>〜<kbd>4</kbd> 復習評価
+        </span>
+        <select id="studyModeSelect" class="mode-select" aria-label="出題モード切替">
+          <option value="due">通常学習（期限到来＋新規優先）</option>
+          <option value="all">全問演習（シャッフル一巡）</option>
+          <option value="weak">苦手特訓（誤答・Again履歴優先）</option>
+        </select>
+        <button type="button" id="btnOpenDataModal" class="btn-ghost">データJSON</button>
+        <button type="button" id="btnResetProgress" class="btn-ghost">進捗リセット</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Main Quiz Column -->
+    <section class="quiz-panel" aria-live="polite">
+      <div id="quizActiveView">
+        <div class="quiz-topbar">
+          <div class="badge-group">
+            <span id="qCategoryBadge" class="cat-badge">カテゴリ</span>
+            <span id="qTypeBadge" class="type-badge">回答形式</span>
+          </div>
+          <div class="badge-group">
+            <span id="qIdBadge" class="srs-badge">#ID</span>
+            <span id="qSrsBadge" class="srs-badge">新規カード</span>
+          </div>
+        </div>
+
+        <div class="quiz-body">
+          <h1 id="qQuestionText" class="question-title">読み込み中...</h1>
+
+          <div class="visual-stage" id="visualStage">
+            <div id="svgFallbackContainer" style="width:100%;"></div>
+            <img id="externalQuestionImg" class="external-photo" alt="出題メタ画像" />
+            <div class="visual-tools">
+              <button type="button" id="btnToggleVisualSource" class="visual-tool-btn" style="display:none;">SVG図解切替</button>
+              <button type="button" id="btnZoomVisual" class="visual-tool-btn">🔍 拡大表示</button>
+            </div>
+          </div>
+
+          <!-- Answer Header -->
+          <div class="answer-header">
+            <div id="answerInstruction" class="answer-instruction">該当する選択肢を選んでください</div>
+            <div class="answer-quick-actions" id="prefQuickTools" style="display:none;">
+              <span id="prefSelectedCounter" class="selection-counter">選択中: 0</span>
+              <button type="button" id="btnExpandAllRegions" class="btn-ghost" style="padding:4px 9px;font-size:0.75rem;">全地方 開閉</button>
+              <button type="button" id="btnClearPrefSelection" class="btn-ghost" style="padding:4px 9px;font-size:0.75rem;">選択クリア</button>
+            </div>
+          </div>
+
+          <!-- Diff Legend for Prefecture Grading -->
+          <div id="diffLegend" class="diff-legend">
+            <span style="font-weight:700;color:var(--text-sub);">判定内訳:</span>
+            <span class="legend-item"><span class="legend-swatch swatch-hit"></span>緑：正解（一致）</span>
+            <span class="legend-item"><span class="legend-swatch swatch-extra"></span>赤：誤答（過剰選択）</span>
+            <span class="legend-item"><span class="legend-swatch swatch-missed"></span>黄枠：見落とし（不足選択）</span>
+          </div>
+
+          <!-- Dynamic Input Area -->
+          <div id="typeAContainer" class="power-grid" style="display:none;"></div>
+          <div id="typeBContainer" class="regions-wrapper" style="display:none;"></div>
+
+          <!-- Submit Button -->
+          <div id="submitBar" class="submit-bar">
+            <button type="button" id="btnSubmitAnswer" class="btn-submit">
+              <span>回答する</span>
+              <kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>
+            </button>
+          </div>
+
+          <!-- Result & Anki Evaluation -->
+          <div id="resultPanel" class="result-panel">
+            <div id="resultBanner" class="result-banner">
+              <div id="resultVerdict" class="result-verdict"></div>
+              <div id="resultSummarySub" style="font-size:0.82rem;"></div>
+            </div>
+            <div class="result-content">
+              <div class="correct-answer-box">
+                <div class="box-label">正解データ</div>
+                <div id="correctAnswerPills" class="correct-pills"></div>
+              </div>
+
+              <div class="explanation-box">
+                <div class="box-label" style="color:var(--accent);">解説・着眼点（メタの特徴）</div>
+                <div id="explanationText"></div>
+              </div>
+
+              <div class="anki-section">
+                <div class="anki-header">
+                  <span>記憶の定着度を評価して次へ進む（復習間隔に自動反映）</span>
+                  <span><kbd>Space</kbd> で推奨評価を選択</span>
+                </div>
+                <div class="anki-grid">
+                  <button type="button" class="anki-btn again" data-rating="again">
+                    <span class="anki-title">Again</span>
+                    <span class="anki-interval" id="ivAgain">再出題 (&lt;1分)</span>
+                    <span class="anki-key">[1] もう一度</span>
+                  </button>
+                  <button type="button" class="anki-btn hard" data-rating="hard">
+                    <span class="anki-title">Hard</span>
+                    <span class="anki-interval" id="ivHard">6時間</span>
+                    <span class="anki-key">[2] 難しい</span>
+                  </button>
+                  <button type="button" class="anki-btn good" data-rating="good">
+                    <span class="anki-title">Good</span>
+                    <span class="anki-interval" id="ivGood">1日</span>
+                    <span class="anki-key">[3] 普通</span>
+                  </button>
+                  <button type="button" class="anki-btn easy" data-rating="easy">
+                    <span class="anki-title">Easy</span>
+                    <span class="anki-interval" id="ivEasy">4日</span>
+                    <span class="anki-key">[4] 簡単</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Queue Completed Screen -->
+      <div id="quizCompleteView" class="complete-state">
+        <div class="complete-icon">🎯</div>
+        <h2 style="font-size:1.35rem;margin-bottom:8px;">現在の学習キューを完了しました！</h2>
+        <p id="completeMessage" style="color:var(--text-sub);font-size:0.92rem;max-width:520px;margin:0 auto;">
+          期限到来の復習カードと新規カードの学習が一通り完了しました。引き続き全問演習や苦手特訓で知識を定着させましょう。
+        </p>
+        <div class="complete-actions">
+          <button type="button" id="btnContinueAll" class="btn-submit" style="width:auto;padding:11px 22px;">全問演習モードで続ける</button>
+          <button type="button" id="btnContinueWeak" class="btn-ghost" style="padding:11px 18px;">苦手問題だけ復習する</button>
+          <button type="button" id="btnClearCatFilter" class="btn-ghost" style="padding:11px 18px;display:none;">カテゴリ絞り込みを解除</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Always-Visible Stats Sidebar -->
+    <aside class="sidebar" aria-label="学習進捗ダッシュボード">
+      <div class="side-card">
+        <div class="side-card-title">
+          <span>セッション進捗・正答率</span>
+          <span id="activeFilterLabel" style="font-size:0.73rem;color:var(--accent);">全カテゴリ</span>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-box">
+            <div class="kpi-label">セッション正答率</div>
+            <div class="kpi-value" id="statSessionRate">--%</div>
+            <div class="kpi-sub" id="statSessionDetail">0 / 0 問正解</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">残り問題数</div>
+            <div class="kpi-value" id="statRemainingCount">0</div>
+            <div class="kpi-sub" id="statTotalPool">全 0 問中</div>
+          </div>
+        </div>
+
+        <div class="srs-summary-row">
+          <div class="srs-mini">
+            <strong id="srsNewCount" style="color:#38bdf8;">0</strong>
+            <span>未学習</span>
+          </div>
+          <div class="srs-mini">
+            <strong id="srsDueCount" style="color:#fbbf24;">0</strong>
+            <span>要復習</span>
+          </div>
+          <div class="srs-mini">
+            <strong id="srsMasteredCount" style="color:#34d399;">0</strong>
+            <span>定着中</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-card-title">
+          <span>カテゴリ別正答率（クリックで絞込）</span>
+          <button type="button" id="btnResetCatFilter" class="btn-ghost" style="padding:2px 7px;font-size:0.7rem;display:none;">全表示</button>
+        </div>
+        <div id="categoryStatsList" class="cat-stats-list"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Zoom Modal -->
+  <div id="zoomModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="出題ビジュアル拡大表示">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>視覚メタ拡大プレビュー</span>
+        <button type="button" id="btnCloseZoomModal" class="btn-ghost">閉じる (Esc)</button>
+      </div>
+      <div class="modal-body zoom-stage" id="zoomModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Data JSON Modal -->
+  <div id="dataModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="問題データJSON管理">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>問題データベース（疎結合JSON配列）確認・カスタム読込</span>
+        <button type="button" id="btnCloseDataModal" class="btn-ghost">閉じる (Esc)</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.84rem;color:var(--text-sub);">
+          問題データは単一配列として定義されています。<code>imageUrl</code> に実画像URLやローカルパスを設定して適用すると実画像が表示され、読み込み失敗・オフライン時は自動的に内蔵SVGメタ図解へフォールバックします。
+        </p>
+        <textarea id="jsonEditorArea" class="json-editor" spellcheck="false"></textarea>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap;">
+          <button type="button" id="btnRestoreDefaultData" class="btn-ghost">初期データに戻す</button>
+          <button type="button" id="btnApplyCustomData" class="btn-submit" style="width:auto;padding:8px 18px;font-size:0.88rem;">JSONを適用</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastMsg" class="toast"></div>
+  <script>
+    "use strict";
+
+    /* =========================================================================
+     * 1. マスター定義（7カテゴリ・10電力会社・8地方47都道府県）
+     * ========================================================================= */
+    const CATEGORIES = [
+      "電柱の表示帯",
+      "電柱ポールトップ",
+      "ガイワイヤー（支線）のカバー",
+      "標識ポールのシール・テープ",
+      "横断歩道のダイヤマーク",
+      "「止まれ」の路面標示",
+      "擁壁のブロック模様"
+    ];
+
+    const POWER_COMPANIES = [
+      "北海道電力",
+      "東北電力",
+      "東京電力",
+      "中部電力",
+      "北陸電力",
+      "関西電力",
+      "中国電力",
+      "四国電力",
+      "九州電力",
+      "沖縄電力"
+    ];
+
+    const REGIONS = [
+      { name: "北海道", prefs: ["北海道"] },
+      { name: "東北", prefs: ["青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県"] },
+      { name: "関東", prefs: ["茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県"] },
+      { name: "中部", prefs: ["新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県"] },
+      { name: "近畿", prefs: ["三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県"] },
+      { name: "中国", prefs: ["鳥取県", "島根県", "岡山県", "広島県", "山口県"] },
+      { name: "四国", prefs: ["徳島県", "香川県", "愛媛県", "高知県"] },
+      { name: "九州・沖縄", prefs: ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"] }
+    ];
+
+    /* =========================================================================
+     * 2. 問題データベース（疎結合JSON互換オブジェクト配列：全30問）
+     * ========================================================================= */
+    const DEFAULT_QUESTIONS_DATA = [
+      // --- 1. 電柱の表示帯 ---
+      {
+        id: "pole_band_01",
+        category: "電柱の表示帯",
+        question: "白地に緑や黒の文字が印字された「縦長の楕円形（オーバル型）」の電柱番号プレートを採用している電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["中部電力"],
+        imageUrl: "./images/pole_band_01.jpg",
+        explanation: "他社が長方形の番号札を採用する中、「縦長の楕円形プレート」は中部電力管内（愛知・岐阜・三重・長野・静岡の富士川以西）を即座に確定できる超重要メタです。"
+      },
+      {
+        id: "pole_band_02",
+        category: "電柱の表示帯",
+        question: "黒地に白または黄文字で「縦書きのカタカナ・漢字」が記された幹線プレートと、外枠のない斜め黒黄反射帯の組み合わせが特徴的な電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["関西電力"],
+        imageUrl: "./images/pole_band_02.jpg",
+        explanation: "関西電力の電柱札は黒背景に縦書き（例：タカマツ・ホンマチ等）の表記が多く、電柱保護の黒黄ストライプ反射シートも外枠がなく斜め縞がはっきりしているのが特徴です。"
+      },
+      {
+        id: "pole_band_03",
+        category: "電柱の表示帯",
+        question: "白い縦長プレートの最上部に「小さな横書き数字（座標）」、その下に「大きな縦書き数字」が整然と並ぶ番号札を持つ電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["北海道電力"],
+        imageUrl: "./images/pole_band_03.jpg",
+        explanation: "北海道電力（ほくでん）の番号札は、上段の小さな数字群が碁盤目状の座標規則を示し、その下に大きな縦数字が続く非常に視認しやすいレイアウトになっています。"
+      },
+      {
+        id: "pole_band_04",
+        category: "電柱の表示帯",
+        question: "電柱に巻かれる黒と黄色の反射帯（リフレクター）が、斜め縞ではなく「水平（横向き）のボーダー縞」になっている特徴が見られる電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["北陸電力"],
+        imageUrl: "./images/pole_band_04.jpg",
+        explanation: "北陸電力管内（富山・石川・福井嶺北）では、黄色い反射シートに黒い水平ラインが複数入った「横縞リフレクター」が多用されており、遠目からでも識別可能です。"
+      },
+      {
+        id: "pole_band_05",
+        category: "電柱の表示帯",
+        question: "白いプレートに赤・黄の曲線アクセント（エネルギア系デザイン）や、横書きカタカナの右寄せ表記が見られる電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["中国電力"],
+        imageUrl: "./images/pole_band_05.jpg",
+        explanation: "中国電力管内（鳥取・島根・岡山・広島・山口）では、横書きカタカナが右寄せになったプレートや赤・黄色のロゴ帯が入った管理札、縦に細かい黒黄反射帯がよく見られます。"
+      },
+      {
+        id: "pole_band_06",
+        category: "電柱の表示帯",
+        question: "プレート上部に四つ葉・クロス状の幾何学エンブレムや緑・青文字の路線記号が入り、独自の四国仕様反射帯と組み合わさる電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["四国電力"],
+        imageUrl: "./images/pole_band_06.jpg",
+        explanation: "四国電力（よんでん）管内では、独特のコーポレート意匠や緑・青系の文字色を用いたコンパクトな電柱札が多く、本州側の中国・関西電力プレートとの識別に有効です。"
+      },
+
+      // --- 2. 電柱ポールトップ ---
+      {
+        id: "pole_top_01",
+        category: "電柱ポールトップ",
+        question: "電柱最上部に「円錐形（三角コーン・とんがり帽子状）」の金属キャップおよび架空地線支持具が載っている電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["東北電力"],
+        imageUrl: "./images/pole_top_01.jpg",
+        explanation: "東北電力管内（東北6県＋新潟県）の電柱頂部には、着雪対策も兼ねた円錐形（コーン型）のキャップ構造が高頻度で見られ、北関東との県境判別でも極めて強力です。"
+      },
+      {
+        id: "pole_top_02",
+        category: "電柱ポールトップ",
+        question: "電柱頂部の架空地線アームが、漢字の「並」の下部のような「二股U字フレーム状」に天端を跨いで固定されている電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["東京電力"],
+        imageUrl: "./images/pole_top_02.jpg",
+        explanation: "東京電力（TEPCO）管内（関東1都6県・山梨・静岡の富士川以東）では、2本の支柱が天端を挟み上部で水平に繋がる独特のU字／並字型ポールトップが標準的です。"
+      },
+      {
+        id: "pole_top_03",
+        category: "電柱ポールトップ",
+        question: "電柱最上部から真上に向かって「細長い鋭角A字型（二等辺三角形）」の金属フレームが伸びている電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["中部電力"],
+        imageUrl: "./images/pole_top_03.jpg",
+        explanation: "中部電力の架空地線支持具は、左右から斜めに細長いアングル材が合わさるシャープな「A字型」が特徴で、空を見上げるだけで中部電力管内と特定できます。"
+      },
+      {
+        id: "pole_top_04",
+        category: "電柱ポールトップ",
+        question: "電柱最上部の金属キャップ側面に「丸い肉抜き穴が縦に2つ並んだ台形・トンネル状」の金具が付いている電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["北陸電力"],
+        imageUrl: "./images/pole_top_04.jpg",
+        explanation: "北陸電力特有の架空地線キャップには丸穴が縦に2つ空いた独特のプレス金具が使われており、岐阜・長野・新潟・滋賀との境界付近で絶大な威力を発揮します。"
+      },
+      {
+        id: "pole_top_05",
+        category: "電柱ポールトップ",
+        question: "電柱の頂部から斜め外側へ「約120度の鈍角（くの字型）」に大きく折れ曲がった1本腕の架空地線アームが伸びる電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["関西電力"],
+        imageUrl: "./images/pole_top_05.jpg",
+        explanation: "関西電力（近畿2府4県および福井県嶺南・三重県熊野周辺の一部）では、約120度に曲がった片持ちのアームが電柱最上部から斜め上に突き出すシルエットが定番です。"
+      },
+      {
+        id: "pole_top_06",
+        category: "電柱ポールトップ",
+        question: "台風・塩害対策のため上部の架空地線ツノを持たず、太いコンクリート柱頂部付近に「十字（＋）状」の短い腕金と耐塩がいしを直付けする電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["沖縄電力"],
+        imageUrl: "./images/pole_top_06.jpg",
+        explanation: "沖縄電力管内では猛烈な台風と塩害に耐えるため、細長いポールトップ金具を省き、太い電柱天端にコンパクトな腕金と白い耐塩皿がいしを強固に固定する構造が多く見られます。"
+      },
+
+      // --- 3. ガイワイヤー（支線）のカバー ---
+      {
+        id: "guy_wire_01",
+        category: "ガイワイヤー（支線）のカバー",
+        question: "下半分が太く、途中から上が細くなる「ボトル型（段付き形状）」の黄色カバーに、黒い螺旋テープが巻かれている仕様が代表的な電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["関西電力"],
+        imageUrl: "./images/guy_wire_01.jpg",
+        explanation: "下が太く上が細い段付き「ボトル型」に黒スパイラルが巻かれた支線ガードは関西電力エリア（および隣接する西日本一部）の象徴的なインフラ特徴のひとつです。"
+      },
+      {
+        id: "guy_wire_02",
+        category: "ガイワイヤー（支線）のカバー",
+        question: "円筒形の黄色い支線プロテクター表面に、螺旋ではなく「黒と黄色の縦縞（縦方向ストライプ）」が入っている本州の電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["中部電力"],
+        imageUrl: "./images/guy_wire_02.jpg",
+        explanation: "中部電力管内では、斜めのトラ模様ではなく「縦方向に黒いラインが走る縦縞の支線カバー」が広く採用されており、東京電力や関西電力との見分けに直結します。"
+      },
+      {
+        id: "guy_wire_03",
+        category: "ガイワイヤー（支線）のカバー",
+        question: "上下で太さが変わらない均一な「円筒形」の黄色い支線カバーに、黒いテープが等間隔の螺旋状に巻かれている仕様が標準の電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["東北電力"],
+        imageUrl: "./images/guy_wire_03.jpg",
+        explanation: "東北電力管内では段差のないストレートな円筒形カバーに黒いスパイラル（螺旋）が入った支線ガードが標準的で、ボトル型の西日本系と明確に区別できます。"
+      },
+      {
+        id: "guy_wire_04",
+        category: "ガイワイヤー（支線）のカバー",
+        question: "黒縞のない「黄色単色」の支線カバーが多用され、支線上部の電柱取付部に「T字型金具」や根元の三角ステイがよく見られる電力会社は？",
+        targetType: "power_company",
+        correctAnswers: ["九州電力"],
+        imageUrl: "./images/guy_wire_04.jpg",
+        explanation: "九州電力管内ではプレーンな黄色一色の支線ガードと、電柱側の特徴的なT字型ブラケット・地際ステイ金具の組み合わせが高頻度で出現します。"
+      },
+
+      // --- 4. 標識ポールのシール・テープ ---
+      {
+        id: "sign_pole_01",
+        category: "標識ポールのシール・テープ",
+        question: "道路標識の白い支柱（ポール）の中腹〜下部に、鮮やかな「赤いリング状のテープ（赤帯1本）」が巻かれている特徴が見られる都道府県は？",
+        targetType: "prefecture",
+        correctAnswers: ["熊本県"],
+        imageUrl: "./images/sign_pole_01.jpg",
+        explanation: "熊本県内の道路標識ポールには、管理・視認用の「赤い1本リングテープ」が非常に高い頻度で巻かれており、九州内の県当てでトップクラスに有名なピンポイントメタです。"
+      },
+      {
+        id: "sign_pole_02",
+        category: "標識ポールのシール・テープ",
+        question: "道路標識の白い支柱に、間隔を空けて「2本の黄色い横ストライプ（二重黄帯テープ）」が巻かれている管理仕様が特徴的な都道府県は？",
+        targetType: "prefecture",
+        correctAnswers: ["青森県"],
+        imageUrl: "./images/sign_pole_02.jpg",
+        explanation: "青森県の道路標識支柱には「黄色いテープが上下2本平行に巻かれたダブルリング」が多く見られ、岩手県・秋田県との県境判別で非常に役立ちます。"
+      },
+      {
+        id: "sign_pole_03",
+        category: "標識ポールのシール・テープ",
+        question: "道路標識の支柱に「赤と黄色の交互ストライプ（ゼブラ帯）」の反射テープ・シールが巻かれていることが多い四国の都道府県は？",
+        targetType: "prefecture",
+        correctAnswers: ["香川県"],
+        imageUrl: "./images/sign_pole_03.jpg",
+        explanation: "香川県では標識のポールに黄色と赤の縞模様（斜めまたは縦縞リング）の反射シートが貼付されているケースが多く、四国4県の中でも特に判別しやすい特徴となっています。"
+      },
+      {
+        id: "sign_pole_04",
+        category: "標識ポールのシール・テープ",
+        question: "道路標識の支柱下部やガードレール支柱に「緑色の縦長管理ステッカー（緑シール）」が高頻度で貼られている東九州の2県は？（複数選択）",
+        targetType: "prefecture",
+        correctAnswers: ["大分県", "宮崎県"],
+        imageUrl: "./images/sign_pole_04.jpg",
+        explanation: "大分県および宮崎県では、標識ポール下部やガードレール支柱に特徴的な「緑色の管理ステッカー」が貼られていることが多く、東九州エリア特定の重要な手がかりになります。"
+      },
+
+      // --- 5. 横断歩道のダイヤマーク ---
+      {
+        id: "diamond_01",
+        category: "横断歩道のダイヤマーク",
+        question: "横断歩道予告の白いダイヤマーク（◇）の辺・角付近に、意図的な「4箇所のスリット（切れ込み隙間）」が入る型が多用される関東の3県は？（複数選択）",
+        targetType: "prefecture",
+        correctAnswers: ["茨城県", "栃木県", "埼玉県"],
+        imageUrl: "./images/diamond_01.jpg",
+        explanation: "北関東の茨城県・栃木県および隣接する埼玉県では、ステンシル型枠の仕様によりダイヤマークに明確な切れ込み（スリット）が入ったタイプが広く分布しています。"
+      },
+      {
+        id: "diamond_02",
+        category: "横断歩道のダイヤマーク",
+        question: "横断歩道手前のダイヤマークの輪郭が実線ではなく、細かな「破線（点線状の短い白線）」で描かれるユニークな路面標示が知られる中国地方の県は？",
+        targetType: "prefecture",
+        correctAnswers: ["岡山県"],
+        imageUrl: "./images/diamond_02.jpg",
+        explanation: "岡山県の一部県道・幹線道路等では、排水性や摩耗抑制・独自施工規格により輪郭が「破線（ドット状セグメント）」になったダイヤマークが存在し、道路メタとして有名です。"
+      },
+      {
+        id: "diamond_03",
+        category: "横断歩道のダイヤマーク",
+        question: "除雪摩耗対策の太く角が閉じた大型ダイヤマークが、路肩上空の「赤白の矢羽根（固定式視線誘導柱）」とセットで現れる都道府県は？",
+        targetType: "prefecture",
+        correctAnswers: ["北海道"],
+        imageUrl: "./images/diamond_03.jpg",
+        explanation: "北海道では広い車線幅に合わせて重厚にペイントされたダイヤマークと、路肩位置を積雪時に示す赤白の下向き矢印（矢羽根）の組み合わせが定番の道路景観となります。"
+      },
+      {
+        id: "diamond_04",
+        category: "横断歩道のダイヤマーク",
+        question: "融雪・雨水排水のためにダイヤの上下左右の頂点付近が大きく開いた（4辺が独立した棒状に見える）スリット型ペイントが特に目立って見られる北陸の2県は？（複数選択）",
+        targetType: "prefecture",
+        correctAnswers: ["富山県", "石川県"],
+        imageUrl: "./images/diamond_04.jpg",
+        explanation: "豪雪・多雨地域の富山県や石川県では、水はけや融雪水対策として頂点部分を繋げず4本の白線パーツとして離して施工するダイヤマークがよく観察されます。"
+      },
+
+      // --- 6. 「止まれ」の路面標示 ---
+      {
+        id: "tomare_01",
+        category: "「止まれ」の路面標示",
+        question: "路面標示「止まれ」の「れ」において、左の縦棒と右の折れ線が離れた「離れ型（関西型）」が主流となる近畿地方の5府県をすべて選べ（※くっつき型の京都府・三重県を除く）",
+        targetType: "prefecture",
+        correctAnswers: ["滋賀県", "大阪府", "兵庫県", "奈良県", "和歌山県"],
+        imageUrl: "./images/tomare_01.jpg",
+        explanation: "関西圏（大阪・兵庫・滋賀・奈良・和歌山）では「れ」の1画目縦線と2画目が分離した「離れ型」フォントが主流です。隣接する京都府だけが「くっつき型」である点が超重要メタです。"
+      },
+      {
+        id: "tomare_02",
+        category: "「止まれ」の路面標示",
+        question: "周囲を「離れ型」の関西圏に囲まれながら、唯一「れ」の縦棒と横線が一体化した角張った「くっつき型」が主流で、府県境特定に直結する近畿の府県は？",
+        targetType: "prefecture",
+        correctAnswers: ["京都府"],
+        imageUrl: "./images/tomare_02.jpg",
+        explanation: "京都府警管轄の路面標示は、大阪・兵庫・滋賀・奈良とは異なり「れ」がガッチリ繋がった角張った「くっつき型」を採用しているため、関西電力エリア内で京都府を一発特定できます。"
+      },
+      {
+        id: "tomare_03",
+        category: "「止まれ」の路面標示",
+        question: "琉球石灰岩骨材による白っぽいアスファルト上に、白い四角の「外枠線（白枠囲み）」や赤舗装枠を伴う角張った「止まれ」が多用される都道府県は？",
+        targetType: "prefecture",
+        correctAnswers: ["沖縄県"],
+        imageUrl: "./images/tomare_03.jpg",
+        explanation: "沖縄県では石灰岩を含む明るい灰白色の路面に加え、「止まれ」の周囲を白い長方形の枠線で囲んだ視認強調ペイントや独特のステンシル書体が非常に多く見られます。"
+      },
+      {
+        id: "tomare_04",
+        category: "「止まれ」の路面標示",
+        question: "都市部の生活道路・狭隘路において、標準サイズより一回り小さく凝縮された「首都圏小型ゴシック調『止まれ』」が高頻度で見られる南関東の2都県は？（複数選択）",
+        targetType: "prefecture",
+        correctAnswers: ["東京都", "神奈川県"],
+        imageUrl: "./images/tomare_04.jpg",
+        explanation: "東京都および神奈川県の住宅街では、道幅に合わせたコンパクトな「小型の止まれ」ペイントが多用されており、関東圏内での南関東絞り込みに有効な補助メタです。"
+      },
+
+      // --- 7. 擁壁のブロック模様 ---
+      {
+        id: "wall_01",
+        category: "擁壁のブロック模様",
+        question: "花崗岩（真砂土）地帯の斜面保護として、明るい灰白色の「正六角形（亀甲型・ハニカム状）」コンクリートブロック擁壁が特に多用される山陽西部の2県は？（複数選択）",
+        targetType: "prefecture",
+        correctAnswers: ["広島県", "山口県"],
+        imageUrl: "./images/wall_01.jpg",
+        explanation: "真砂土（風化花崗岩）による土砂災害対策が進む広島県〜山口県エリアでは、白っぽい色調の六角形（亀甲積み）装飾擁壁や独特の法面ブロックが住宅団地・山沿いで頻出します。"
+      },
+      {
+        id: "wall_02",
+        category: "擁壁のブロック模様",
+        question: "急峻な斜面都市が多く、黒っぽい火山岩系の石積みと、表面に「十字・四つ目突起模様」が入った間知ブロック擁壁が坂道沿いに密集する九州西端の県は？",
+        targetType: "prefecture",
+        correctAnswers: ["長崎県"],
+        imageUrl: "./images/wall_02.jpg",
+        explanation: "平地が少なく斜面住宅地が多い長崎県では、安山岩・玄武岩の黒みがかった石垣と、四つ目・十字レリーフ模様の間知ブロック擁壁が幾重にも重なる独特の景観を作ります。"
+      },
+      {
+        id: "wall_03",
+        category: "擁壁のブロック模様",
+        question: "河川の丸石を埋め込んだ「玉石（丸石）コンクリート擁壁」がみかん畑・茶畑や山間道路の法面に特に象徴的に見られる東海道隣接の2県は？（複数選択）",
+        targetType: "prefecture",
+        correctAnswers: ["神奈川県", "静岡県"],
+        imageUrl: "./images/wall_03.jpg",
+        explanation: "酒匂川・富士川・安倍川・大井川などの急流河川が多い神奈川県西部〜静岡県にかけては、丸い川石（玉石）を使った伝統的な玉石積み擁壁が農地斜面や旧道沿いに数多く残っています。"
+      }
+    ];
+
+    /* =========================================================================
+     * 3. 視覚メタ再現ベクター（SVG）イラスト描画エンジン（オフライン完全対応）
+     * ========================================================================= */
+    function renderMetaSVG(q) {
+      const id = q.id;
+      const w = 800;
+      const h = 420;
+
+      // 共通背景グラデーション定義
+      const commonDefs = `
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.45"/>
+            <stop offset="65%" stop-color="#38bdf8" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#1e293b" stop-opacity="0.9"/>
+          </linearGradient>
+          <linearGradient id="poleConcrete" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#64748b"/>
+            <stop offset="38%" stop-color="#cbd5e1"/>
+            <stop offset="72%" stop-color="#94a3b8"/>
+            <stop offset="100%" stop-color="#475569"/>
+          </linearGradient>
+          <linearGradient id="asphaltGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1e293b"/>
+            <stop offset="100%" stop-color="#334155"/>
+          </linearGradient>
+          <pattern id="diagReflect" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+            <rect width="12" height="24" fill="#facc15"/>
+            <rect x="12" width="12" height="24" fill="#111827"/>
+          </pattern>
+          <pattern id="vertStripe" width="14" height="24" patternUnits="userSpaceOnUse">
+            <rect width="7" height="24" fill="#facc15"/>
+            <rect x="7" width="7" height="24" fill="#111827"/>
+          </pattern>
+          <pattern id="horizStripe" width="24" height="18" patternUnits="userSpaceOnUse">
+            <rect width="24" height="9" fill="#facc15"/>
+            <rect y="9" width="24" height="9" fill="#111827"/>
+          </pattern>
+        </defs>
+      `;
+
+      let scene = "";
+
+      // --- カテゴリ1: 電柱の表示帯 ---
+      if (id.startsWith("pole_band_")) {
+        let plateSvg = "";
+        if (id === "pole_band_01") {
+          // 中部電力：縦長楕円形プレート
+          plateSvg = `
+            <ellipse cx="400" cy="185" rx="34" ry="74" fill="#f8fafc" stroke="#15803d" stroke-width="3"/>
+            <circle cx="400" cy="132" r="5" fill="#94a3b8"/>
+            <circle cx="400" cy="238" r="5" fill="#94a3b8"/>
+            <text x="400" y="164" text-anchor="middle" fill="#15803d" font-size="16" font-weight="800" font-family="sans-serif">サクラ</text>
+            <line x1="374" y1="174" x2="426" y2="174" stroke="#15803d" stroke-width="2"/>
+            <text x="400" y="200" text-anchor="middle" fill="#0f172a" font-size="22" font-weight="900" font-family="monospace">34</text>
+            <text x="400" y="224" text-anchor="middle" fill="#0f172a" font-size="20" font-weight="900" font-family="monospace">128</text>
+            <g transform="translate(510, 120)">
+              <rect width="220" height="110" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="110" y="28" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">拡大ディテール（着眼点）</text>
+              <ellipse cx="110" cy="68" rx="22" ry="34" fill="#f8fafc" stroke="#15803d" stroke-width="2.5"/>
+              <text x="110" y="73" text-anchor="middle" fill="#0f172a" font-size="12" font-weight="800">楕円形</text>
+            </g>
+          `;
+        } else if (id === "pole_band_02") {
+          // 関西電力：黒地に縦書きカタカナ＋外枠なし斜め黒黄反射帯
+          plateSvg = `
+            <rect x="382" y="88" width="36" height="122" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+            <text x="400" y="114" text-anchor="middle" fill="#facc15" font-size="16" font-weight="800">ホ</text>
+            <text x="400" y="134" text-anchor="middle" fill="#facc15" font-size="16" font-weight="800">ン</text>
+            <text x="400" y="154" text-anchor="middle" fill="#facc15" font-size="16" font-weight="800">マ</text>
+            <text x="400" y="174" text-anchor="middle" fill="#facc15" font-size="16" font-weight="800">チ</text>
+            <text x="400" y="198" text-anchor="middle" fill="#f8fafc" font-size="15" font-weight="800">二四</text>
+            <rect x="352" y="242" width="96" height="120" fill="url(#diagReflect)"/>
+          `;
+        } else if (id === "pole_band_03") {
+          // 北海道電力：上部小数字（横）＋下部大数字（縦）
+          plateSvg = `
+            <rect x="376" y="100" width="48" height="156" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+            <rect x="376" y="100" width="48" height="28" fill="#e2e8f0"/>
+            <text x="400" y="119" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="900" font-family="monospace">14-32</text>
+            <line x1="376" y1="128" x2="424" y2="128" stroke="#64748b" stroke-width="1.5"/>
+            <text x="400" y="162" text-anchor="middle" fill="#0f172a" font-size="28" font-weight="900" font-family="monospace">5</text>
+            <text x="400" y="198" text-anchor="middle" fill="#0f172a" font-size="28" font-weight="900" font-family="monospace">2</text>
+            <text x="400" y="234" text-anchor="middle" fill="#0f172a" font-size="28" font-weight="900" font-family="monospace">8</text>
+          `;
+        } else if (id === "pole_band_04") {
+          // 北陸電力：横向き水平ストライプ反射帯
+          plateSvg = `
+            <rect x="380" y="95" width="40" height="96" rx="2" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+            <text x="400" y="125" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="800">24-A</text>
+            <text x="400" y="155" text-anchor="middle" fill="#0f172a" font-size="16" font-weight="900">106</text>
+            <rect x="352" y="220" width="96" height="145" fill="url(#horizStripe)" stroke="#facc15" stroke-width="2"/>
+            <g transform="translate(505, 225)">
+              <rect width="230" height="90" rx="10" fill="#0f172a" stroke="#facc15" stroke-width="1.5"/>
+              <text x="115" y="34" text-anchor="middle" fill="#facc15" font-size="14" font-weight="800">水平（横縞）リフレクター</text>
+              <text x="115" y="60" text-anchor="middle" fill="#cbd5e1" font-size="12">斜めではなく真横に黒黄ライン</text>
+            </g>
+          `;
+        } else if (id === "pole_band_05") {
+          // 中国電力：赤黄アクセント＋右寄せ横書きカタカナ
+          plateSvg = `
+            <rect x="366" y="110" width="68" height="106" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+            <path d="M366 122 Q400 112 434 122 L434 130 Q400 120 366 130 Z" fill="#ef4444"/>
+            <path d="M366 130 Q400 120 434 130 L434 136 Q400 126 366 136 Z" fill="#facc15"/>
+            <text x="428" y="160" text-anchor="end" fill="#0f172a" font-size="13" font-weight="800">ナカマチ</text>
+            <text x="428" y="182" text-anchor="end" fill="#0f172a" font-size="15" font-weight="900" font-family="monospace">支 14-2</text>
+            <rect x="358" y="245" width="84" height="120" fill="url(#vertStripe)" stroke="#facc15" stroke-width="2"/>
+          `;
+        } else {
+          // 四国電力：四つ葉幾何学モチーフ＋緑/青系コード
+          plateSvg = `
+            <rect x="372" y="106" width="56" height="122" rx="3" fill="#f8fafc" stroke="#0284c7" stroke-width="1.8"/>
+            <g transform="translate(400, 128)">
+              <circle cx="-5" cy="-5" r="4.5" fill="#16a34a"/>
+              <circle cx="5" cy="-5" r="4.5" fill="#0284c7"/>
+              <circle cx="-5" cy="5" r="4.5" fill="#0284c7"/>
+              <circle cx="5" cy="5" r="4.5" fill="#f59e0b"/>
+            </g>
+            <text x="400" y="162" text-anchor="middle" fill="#0369a1" font-size="13" font-weight="800">サヌキ</text>
+            <text x="400" y="188" text-anchor="middle" fill="#15803d" font-size="16" font-weight="900" font-family="monospace">18-4</text>
+            <rect x="354" y="252" width="92" height="112" fill="url(#diagReflect)" stroke="#ef4444" stroke-width="2"/>
+          `;
+        }
+
+        scene = `
+          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
+          <path d="M0 330 Q200 290 420 325 T800 310 L800 420 L0 420 Z" fill="#0f172a" opacity="0.75"/>
+          <rect x="352" y="15" width="96" height="405" fill="url(#poleConcrete)"/>
+          <rect x="349" y="65" width="102" height="8" rx="2" fill="#475569"/>
+          ${plateSvg}
+        `;
+      }
+
+      // --- カテゴリ2: 電柱ポールトップ ---
+      else if (id.startsWith("pole_top_")) {
+        let capSvg = "";
+        if (id === "pole_top_01") {
+          // 東北電力：円錐形コーンキャップ
+          capSvg = `
+            <polygon points="400,48 366,142 434,142" fill="#cbd5e1" stroke="#475569" stroke-width="3"/>
+            <line x1="400" y1="48" x2="400" y2="142" stroke="#64748b" stroke-width="2"/>
+            <circle cx="400" cy="44" r="6" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+            <line x1="60" y1="44" x2="740" y2="44" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,3"/>
+          `;
+        } else if (id === "pole_top_02") {
+          // 東京電力：二股U字・「並」型フレーム
+          capSvg = `
+            <path d="M368 155 L368 74 L432 74 L432 155" fill="none" stroke="#cbd5e1" stroke-width="7" stroke-linejoin="round"/>
+            <line x1="358" y1="74" x2="442" y2="74" stroke="#e2e8f0" stroke-width="7"/>
+            <line x1="400" y1="74" x2="400" y2="48" stroke="#cbd5e1" stroke-width="6"/>
+            <circle cx="400" cy="45" r="6" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+            <line x1="60" y1="45" x2="740" y2="45" stroke="#94a3b8" stroke-width="2"/>
+          `;
+        } else if (id === "pole_top_03") {
+          // 中部電力：細長い鋭角A字型
+          capSvg = `
+            <path d="M374 155 L400 42 L426 155" fill="none" stroke="#e2e8f0" stroke-width="6.5" stroke-linejoin="round"/>
+            <line x1="383" y1="112" x2="417" y2="112" stroke="#cbd5e1" stroke-width="5"/>
+            <circle cx="400" cy="40" r="6" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+            <line x1="60" y1="40" x2="740" y2="40" stroke="#94a3b8" stroke-width="2"/>
+          `;
+        } else if (id === "pole_top_04") {
+          // 北陸電力：丸穴が縦に2つ空いた台形キャップ
+          capSvg = `
+            <polygon points="384,56 416,56 430,145 370,145" fill="#cbd5e1" stroke="#475569" stroke-width="3"/>
+            <circle cx="400" cy="84" r="10" fill="#0f172a" stroke="#475569" stroke-width="2.5"/>
+            <circle cx="400" cy="118" r="12" fill="#0f172a" stroke="#475569" stroke-width="2.5"/>
+            <circle cx="400" cy="48" r="6" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+            <line x1="60" y1="48" x2="740" y2="48" stroke="#94a3b8" stroke-width="2"/>
+          `;
+        } else if (id === "pole_top_05") {
+          // 関西電力：120度くの字に折れ曲がった1本腕
+          capSvg = `
+            <path d="M400 150 L400 108 L478 52" fill="none" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="480" cy="50" r="6.5" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+            <line x1="60" y1="50" x2="740" y2="50" stroke="#94a3b8" stroke-width="2"/>
+            <text x="530" y="96" fill="#38bdf8" font-size="14" font-weight="700">約120°の鈍角アーム</text>
+          `;
+        } else {
+          // 沖縄電力：架空地線ツノなし＋太柱天端直近の十字/短腕金＋耐塩皿がいし
+          capSvg = `
+            <rect x="364" y="136" width="72" height="12" rx="4" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>
+            <text x="400" y="95" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="700">頂部ツノなし（フラット天端）</text>
+            <ellipse cx="290" cy="196" rx="14" ry="7" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+            <ellipse cx="290" cy="205" rx="14" ry="7" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+            <ellipse cx="510" cy="196" rx="14" ry="7" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+            <ellipse cx="510" cy="205" rx="14" ry="7" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+          `;
+        }
+
+        scene = `
+          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
+          <!-- 電柱本体 -->
+          <polygon points="368,142 432,142 444,420 356,420" fill="url(#poleConcrete)"/>
+          <!-- 高圧腕金とがいし -->
+          <rect x="230" y="212" width="340" height="12" rx="2" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+          <rect x="256" y="192" width="14" height="20" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+          <rect x="393" y="192" width="14" height="20" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+          <rect x="530" y="192" width="14" height="20" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+          <line x1="40" y1="192" x2="760" y2="192" stroke="#475569" stroke-width="2.2"/>
+          ${capSvg}
+        `;
+      }
+
+      // --- カテゴリ3: ガイワイヤー（支線）のカバー ---
+      else if (id.startsWith("guy_wire_")) {
+        let guardSvg = "";
+        if (id === "guy_wire_01") {
+          // 関西電力：ボトル型（下太・上細）＋黒螺旋
+          guardSvg = `
+            <g transform="translate(420, 215) rotate(-32)">
+              <!-- 上部細筒 -->
+              <rect x="-7" y="-120" width="14" height="95" rx="3" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>
+              <path d="M-7 -105 L7 -92 M-7 -80 L7 -67 M-7 -55 L7 -42" stroke="#111827" stroke-width="5"/>
+              <!-- 下部太筒（ボトル部） -->
+              <path d="M-7 -25 L-15 -12 L-15 115 L15 115 L15 -12 L7 -25 Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.8"/>
+              <path d="M-15 15 L15 32 M-15 55 L15 72 M-15 90 L15 107" stroke="#111827" stroke-width="6"/>
+            </g>
+            <text x="585" y="160" text-anchor="middle" fill="#facc15" font-size="15" font-weight="800">下が太く上が細い「ボトル型」</text>
+          `;
+        } else if (id === "guy_wire_02") {
+          // 中部電力：円筒＋黒黄の縦ストライプ
+          guardSvg = `
+            <g transform="translate(420, 215) rotate(-32)">
+              <rect x="-12" y="-115" width="24" height="230" rx="4" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>
+              <line x1="-6" y1="-113" x2="-6" y2="113" stroke="#111827" stroke-width="4"/>
+              <line x1="0" y1="-113" x2="0" y2="113" stroke="#111827" stroke-width="4"/>
+              <line x1="6" y1="-113" x2="6" y2="113" stroke="#111827" stroke-width="4"/>
+            </g>
+            <text x="590" y="160" text-anchor="middle" fill="#facc15" font-size="15" font-weight="800">平行な「縦縞（縦ストライプ）」</text>
+          `;
+        } else if (id === "guy_wire_03") {
+          // 東北電力：均一円筒＋黒スパイラル
+          guardSvg = `
+            <g transform="translate(420, 215) rotate(-32)">
+              <rect x="-11" y="-115" width="22" height="230" rx="4" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>
+              <path d="M-11 -95 L11 -78 M-11 -55 L11 -38 M-11 -15 L11 2 M-11 25 L11 42 M-11 65 L11 82" stroke="#111827" stroke-width="6"/>
+            </g>
+            <text x="590" y="160" text-anchor="middle" fill="#facc15" font-size="15" font-weight="800">均一な円筒形＋黒螺旋巻き</text>
+          `;
+        } else {
+          // 九州電力：黄色単色カバー＋T字取付金具・三角ステイ
+          guardSvg = `
+            <rect x="278" y="54" width="44" height="10" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+            <rect x="306" y="42" width="10" height="34" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+            <g transform="translate(420, 215) rotate(-32)">
+              <rect x="-11" y="-115" width="22" height="225" rx="4" fill="#fde047" stroke="#ca8a04" stroke-width="1.8"/>
+            </g>
+            <polygon points="485,365 520,365 502,328" fill="none" stroke="#cbd5e1" stroke-width="4"/>
+            <text x="580" y="150" text-anchor="middle" fill="#fde047" font-size="15" font-weight="800">黄単色カバー＋T字金具/三角ステイ</text>
+          `;
+        }
+
+        scene = `
+          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
+          <rect y="345" width="${w}" height="75" fill="url(#asphaltGrad)"/>
+          <rect x="242" y="10" width="66" height="350" fill="url(#poleConcrete)"/>
+          <line x1="305" y1="35" x2="505" y2="360" stroke="#94a3b8" stroke-width="4"/>
+          ${guardSvg}
+        `;
+      }
+
+      // --- カテゴリ4: 標識ポールのシール・テープ ---
+      else if (id.startsWith("sign_pole_")) {
+        let stickerSvg = "";
+        if (id === "sign_pole_01") {
+          // 熊本県：赤いリングテープ1本
+          stickerSvg = `
+            <rect x="387" y="238" width="26" height="22" fill="#ef4444" stroke="#b91c1c" stroke-width="1.5"/>
+            <circle cx="400" cy="249" r="46" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,4"/>
+          `;
+        } else if (id === "sign_pole_02") {
+          // 青森県：2本の黄色横ストライプ
+          stickerSvg = `
+            <rect x="387" y="218" width="26" height="16" fill="#facc15" stroke="#ca8a04" stroke-width="1.2"/>
+            <rect x="387" y="254" width="26" height="16" fill="#facc15" stroke="#ca8a04" stroke-width="1.2"/>
+            <circle cx="400" cy="244" r="52" fill="none" stroke="#facc15" stroke-width="2" stroke-dasharray="5,4"/>
+          `;
+        } else if (id === "sign_pole_03") {
+          // 香川県：赤と黄色のストライプテープ
+          stickerSvg = `
+            <rect x="387" y="218" width="26" height="54" fill="#facc15" stroke="#b91c1c" stroke-width="1.2"/>
+            <rect x="387" y="218" width="26" height="11" fill="#ef4444"/>
+            <rect x="387" y="240" width="26" height="11" fill="#ef4444"/>
+            <rect x="387" y="261" width="26" height="11" fill="#ef4444"/>
+          `;
+        } else {
+          // 大分県・宮崎県：緑色の管理ステッカー（標識下部＆ガードレール支柱）
+          stickerSvg = `
+            <rect x="391" y="268" width="18" height="48" rx="2" fill="#16a34a" stroke="#bbf7d0" stroke-width="1.2"/>
+            <!-- ガードレールと支柱の緑シール -->
+            <rect x="520" y="275" width="220" height="36" rx="6" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>
+            <rect x="595" y="311" width="20" height="70" fill="#94a3b8"/>
+            <rect x="598" y="324" width="14" height="34" rx="1" fill="#16a34a" stroke="#bbf7d0" stroke-width="1"/>
+          `;
+        }
+
+        scene = `
+          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
+          <rect y="355" width="${w}" height="65" fill="url(#asphaltGrad)"/>
+          <!-- 白い標識ポール -->
+          <rect x="388" y="115" width="24" height="255" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+          <!-- 道路標識（制限速度40イメージ） -->
+          <circle cx="400" cy="82" r="46" fill="#f8fafc" stroke="#ef4444" stroke-width="12"/>
+          <text x="400" y="95" text-anchor="middle" fill="#1e3a8a" font-size="36" font-weight="900" font-family="sans-serif">40</text>
+          ${stickerSvg}
+        `;
+      }
+
+      // --- カテゴリ5: 横断歩道のダイヤマーク ---
+      else if (id.startsWith("diamond_")) {
+        let diamondDetail = "";
+        if (id === "diamond_01") {
+          // 茨城・栃木・埼玉：4箇所のスリット入りダイヤ
+          diamondDetail = `
+            <g stroke="#f8fafc" stroke-width="11" fill="none" stroke-linecap="butt">
+              <path d="M400 162 L442 214"/>
+              <path d="M454 229 L468 246 L450 268"/>
+              <path d="M438 283 L400 330 L362 283"/>
+              <path d="M350 268 L332 246 L346 229"/>
+              <path d="M358 214 L400 162"/>
+            </g>
+            <g transform="translate(545, 40)">
+              <rect width="215" height="150" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="107" y="24" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">平面拡大（4箇所スリット）</text>
+              <path d="M107 40 L132 72 M139 81 L147 91 L138 102 M130 112 L107 138 L84 112 M76 102 L67 91 L75 81 M82 72 L107 40" stroke="#f8fafc" stroke-width="5.5" fill="none"/>
+            </g>
+          `;
+        } else if (id === "diamond_02") {
+          // 岡山県：破線ダイヤマーク
+          diamondDetail = `
+            <polygon points="400,160 470,246 400,332 330,246" fill="none" stroke="#f8fafc" stroke-width="11" stroke-dasharray="15,10"/>
+            <g transform="translate(545, 40)">
+              <rect width="215" height="150" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="107" y="24" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">平面拡大（破線セグメント）</text>
+              <polygon points="107,40 148,90 107,138 66,90" fill="none" stroke="#f8fafc" stroke-width="5.5" stroke-dasharray="9,6"/>
+            </g>
+          `;
+        } else if (id === "diamond_03") {
+          // 北海道：太く閉じた大型ダイヤ＋赤白矢羽根（固定式視線誘導柱）
+          diamondDetail = `
+            <polygon points="400,158 478,246 400,336 322,246" fill="none" stroke="#f8fafc" stroke-width="16" stroke-linejoin="miter"/>
+            <!-- 矢羽根（スノーポール） -->
+            <path d="M175 260 L175 68 L235 68" fill="none" stroke="#cbd5e1" stroke-width="7"/>
+            <g transform="translate(232, 72)">
+              <polygon points="0,0 18,0 18,36 30,36 9,64 -12,36 0,36" fill="#ef4444" stroke="#f8fafc" stroke-width="2.5"/>
+              <rect x="0" y="14" width="18" height="14" fill="#f8fafc"/>
+            </g>
+          `;
+        } else {
+          // 富山・石川：4つの頂点が大きく開いた排水スリット型
+          diamondDetail = `
+            <g stroke="#f8fafc" stroke-width="12" fill="none" stroke-linecap="square">
+              <line x1="414" y1="176" x2="458" y2="230"/>
+              <line x1="458" y1="262" x2="414" y2="316"/>
+              <line x1="386" y1="316" x2="342" y2="262"/>
+              <line x1="342" y1="230" x2="386" y2="176"/>
+            </g>
+            <g transform="translate(545, 40)">
+              <rect width="215" height="150" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="107" y="24" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">頂点開放型（融雪・排水仕様）</text>
+              <g stroke="#f8fafc" stroke-width="5.5">
+                <line x1="115" y1="48" x2="142" y2="82"/>
+                <line x1="142" y1="98" x2="115" y2="132"/>
+                <line x1="99" y1="132" x2="72" y2="98"/>
+                <line x1="72" y1="82" x2="99" y2="48"/>
+              </g>
+            </g>
+          `;
+        }
+
+        scene = `
+          <rect width="${w}" height="125" fill="url(#skyGrad)"/>
+          <rect y="125" width="${w}" height="295" fill="#1e293b"/>
+          <polygon points="270,125 530,125 740,420 60,420" fill="#334155"/>
+          <line x1="282" y1="125" x2="95" y2="420" stroke="#f8fafc" stroke-width="5"/>
+          <line x1="518" y1="125" x2="705" y2="420" stroke="#f59e0b" stroke-width="5"/>
+          ${diamondDetail}
+        `;
+      }
+
+      // --- カテゴリ6: 「止まれ」の路面標示 ---
+      else if (id.startsWith("tomare_")) {
+        let tomareDetail = "";
+        if (id === "tomare_01") {
+          // 関西型：「れ」が離れ型
+          tomareDetail = `
+            <text x="275" y="275" fill="#f8fafc" font-size="76" font-weight="900" font-family="sans-serif">止ま</text>
+            <!-- 離れ型の「れ」をパスで正確に描画 -->
+            <g transform="translate(445, 208)" stroke="#f8fafc" stroke-width="10" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+              <!-- 左の縦棒＋短い横棒（右と分離！） -->
+              <line x1="18" y1="4" x2="18" y2="68"/>
+              <line x1="4" y1="24" x2="26" y2="24"/>
+              <!-- 離れた右パーツ -->
+              <path d="M42 26 L62 14 L42 54 L66 24 L66 60 Q66 68 78 66"/>
+            </g>
+            <circle cx="486" cy="245" r="46" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="5,4"/>
+            <text x="400" y="348" text-anchor="middle" fill="#38bdf8" font-size="15" font-weight="800">着眼点：「れ」の縦棒と右パーツが明確に分離（離れ型）</text>
+          `;
+        } else if (id === "tomare_02") {
+          // 京都府：「れ」がくっつき型（角張り）
+          tomareDetail = `
+            <text x="275" y="275" fill="#f8fafc" font-size="76" font-weight="900" font-family="sans-serif">止ま</text>
+            <g transform="translate(445, 208)" stroke="#f8fafc" stroke-width="10" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+              <!-- 一体化したくっつき型の「れ」 -->
+              <line x1="20" y1="4" x2="20" y2="68"/>
+              <path d="M4 24 L58 18 L20 52 L64 22 L64 62 L78 62"/>
+            </g>
+            <circle cx="486" cy="245" r="46" fill="none" stroke="#facc15" stroke-width="2.5" stroke-dasharray="5,4"/>
+            <text x="400" y="348" text-anchor="middle" fill="#facc15" font-size="15" font-weight="800">着眼点：「れ」の1画目と2画目がガッチリ結合（くっつき型）</text>
+          `;
+        } else if (id === "tomare_03") {
+          // 沖縄県：白っぽい石灰岩アスファルト＋白枠囲み「止まれ」
+          tomareDetail = `
+            <rect x="90" y="130" width="620" height="270" fill="#64748b" opacity="0.55"/>
+            <rect x="210" y="178" width="380" height="128" fill="rgba(220,38,38,0.28)" stroke="#f8fafc" stroke-width="9"/>
+            <text x="400" y="266" text-anchor="middle" fill="#f8fafc" font-size="72" font-weight="900" letter-spacing="8" font-family="sans-serif">止まれ</text>
+            <text x="400" y="352" text-anchor="middle" fill="#f8fafc" font-size="15" font-weight="800">白っぽい石灰岩骨材アスファルト ＋ 四角い白枠囲み</text>
+          `;
+        } else {
+          // 東京都・神奈川県：狭隘生活道路の小型「止まれ」
+          tomareDetail = `
+            <text x="400" y="256" text-anchor="middle" fill="#f8fafc" font-size="42" font-weight="800" letter-spacing="3" font-family="sans-serif">止まれ</text>
+            <rect x="315" y="212" width="170" height="58" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5,4"/>
+            <text x="400" y="335" text-anchor="middle" fill="#38bdf8" font-size="15" font-weight="700">車線幅に対して凝縮されたコンパクトな首都圏小型サイズ</text>
+          `;
+        }
+
+        scene = `
+          <rect width="${w}" height="110" fill="url(#skyGrad)"/>
+          <rect y="110" width="${w}" height="310" fill="#273449"/>
+          <line x1="160" y1="152" x2="640" y2="152" stroke="#f8fafc" stroke-width="14"/>
+          <line x1="140" y1="110" x2="60" y2="420" stroke="#cbd5e1" stroke-width="5"/>
+          <line x1="660" y1="110" x2="740" y2="420" stroke="#cbd5e1" stroke-width="5"/>
+          ${tomareDetail}
+        `;
+      }
+
+      // --- カテゴリ7: 擁壁のブロック模様 ---
+      else if (id.startsWith("wall_")) {
+        let wallDetail = "";
+        if (id === "wall_01") {
+          // 広島・山口：明るい灰白色の六角形（亀甲型）ブロック擁壁
+          let hexes = "";
+          const r = 34;
+          const dx = 58;
+          const dy = 50;
+          for (let row = 0; row < 5; row++) {
+            for (let col = 0; col < 11; col++) {
+              const cx = 80 + col * dx + (row % 2 === 1 ? dx / 2 : 0);
+              const cy = 95 + row * dy;
+              const pts = [];
+              for (let k = 0; k < 6; k++) {
+                const ang = (Math.PI / 180) * (60 * k - 30);
+                pts.push(`${(cx + r * Math.cos(ang)).toFixed(1)},${(cy + r * Math.sin(ang)).toFixed(1)}`);
+              }
+              hexes += `<polygon points="${pts.join(" ")}" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/>`;
+              hexes += `<polygon points="${pts.join(" ")}" transform="translate(${cx},${cy}) scale(0.68) translate(${-cx},${-cy})" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>`;
+            }
+          }
+          wallDetail = `
+            <rect y="45" width="${w}" height="295" fill="#94a3b8"/>
+            ${hexes}
+            <circle cx="255" cy="245" r="7" fill="#1e293b"/>
+            <circle cx="545" cy="245" r="7" fill="#1e293b"/>
+          `;
+        } else if (id === "wall_02") {
+          // 長崎県：黒っぽい火山岩系ブロック＋十字・四つ目突起模様の間知ブロック
+          let blocks = "";
+          for (let row = 0; row < 5; row++) {
+            for (let col = 0; col < 9; col++) {
+              const bx = 55 + col * 82 + (row % 2) * 41;
+              const by = 62 + row * 54;
+              blocks += `
+                <g transform="translate(${bx}, ${by})">
+                  <rect width="78" height="50" rx="3" fill="#475569" stroke="#1e293b" stroke-width="3"/>
+                  <rect x="12" y="9" width="22" height="13" fill="#64748b"/>
+                  <rect x="44" y="9" width="22" height="13" fill="#64748b"/>
+                  <rect x="12" y="28" width="22" height="13" fill="#64748b"/>
+                  <rect x="44" y="28" width="22" height="13" fill="#64748b"/>
+                </g>
+              `;
+            }
+          }
+          wallDetail = `
+            <rect y="50" width="${w}" height="290" fill="#1e293b"/>
+            ${blocks}
+          `;
+        } else {
+          // 神奈川・静岡：丸い川石を埋め込んだ玉石コンクリート擁壁
+          let cobbles = "";
+          for (let row = 0; row < 6; row++) {
+            for (let col = 0; col < 13; col++) {
+              const cx = 52 + col * 58 + (row % 2) * 28;
+              const cy = 82 + row * 44;
+              const rx = 21 + ((row + col) % 3) * 2;
+              const ry = 16 + ((row * col) % 3) * 1.5;
+              const shade = (row + col) % 2 === 0 ? "#94a3b8" : "#78879b";
+              cobbles += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${shade}" stroke="#475569" stroke-width="2.5"/>`;
+            }
+          }
+          wallDetail = `
+            <path d="M0 55 Q240 20 520 45 T800 35 L800 75 L0 75 Z" fill="#15803d" opacity="0.75"/>
+            <rect y="62" width="${w}" height="278" fill="#64748b"/>
+            ${cobbles}
+          `;
+        }
+
+        scene = `
+          <rect width="${w}" height="${h}" fill="#0f172a"/>
+          ${wallDetail}
+          <rect y="340" width="${w}" height="80" fill="url(#asphaltGrad)"/>
+          <line x1="0" y1="352" x2="${w}" y2="352" stroke="#cbd5e1" stroke-width="4"/>
+        `;
+      }
+
+      // --- カスタム追加問題用の汎用SVGフォールバック ---
+      else {
+        scene = `
+          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
+          <rect x="140" y="70" width="520" height="280" rx="14" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+          <text x="400" y="185" text-anchor="middle" fill="#38bdf8" font-size="22" font-weight="800">${escapeHtml(q.category)}</text>
+          <text x="400" y="225" text-anchor="middle" fill="#cbd5e1" font-size="15">ID: ${escapeHtml(q.id)}（SVGプレースホルダー）</text>
+        `;
+      }
+
+      return `
+        <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeHtml(q.category)} 視覚メタ図解">
+          ${commonDefs}
+          ${scene}
+        </svg>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+    /* =========================================================================
+     * 4. 状態管理・localStorage永続化・Anki間隔反復（SM-2ベース）
+     * ========================================================================= */
+    const STORAGE_KEY_SRS = "geoanki_jp_srs_v1";
+    const STORAGE_KEY_CUSTOM_Q = "geoanki_jp_custom_questions_v1";
+
+    let questionsPool = loadQuestionsPool();
+    let srsState = loadSrsState();
+
+    // セッション統計
+    let sessionStats = {
+      correct: 0,
+      total: 0
+    };
+
+    // 学習キュー・UI状態
+    let studyMode = "due"; // 'due' | 'all' | 'weak'
+    let activeCategoryFilter = null; // null または カテゴリ名
+    let studyQueue = [];
+    let currentQuestion = null;
+    let quizPhase = "answering"; // 'answering' | 'reviewed'
+    let lastIsCorrect = false;
+    let selectedAnswers = new Set();
+    let openRegions = new Set();
+    let showingExternalPhoto = false;
+
+    function loadQuestionsPool() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_CUSTOM_Q);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (err) {
+        console.warn("カスタム問題データの読み込みに失敗したため初期データを使用します:", err);
+      }
+      return structuredCloneData(DEFAULT_QUESTIONS_DATA);
+    }
+
+    function structuredCloneData(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function loadSrsState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_SRS);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") return parsed;
+        }
+      } catch (err) {
+        console.warn("学習進捗データの読み込みに失敗しました:", err);
+      }
+      return {};
+    }
+
+    function saveSrsState() {
+      try {
+        localStorage.setItem(STORAGE_KEY_SRS, JSON.stringify(srsState));
+      } catch (err) {
+        console.warn("localStorageへの保存に失敗しました:", err);
+      }
+    }
+
+    function getCardRecord(id) {
+      if (!srsState[id]) {
+        srsState[id] = {
+          intervalDays: 0,
+          ease: 2.5,
+          reps: 0,
+          lapses: 0,
+          dueAt: 0,
+          correctTotal: 0,
+          attemptTotal: 0,
+          lastRating: null
+        };
+      }
+      return srsState[id];
+    }
+
+    function computeNextSchedules(rec) {
+      const ease = rec.ease || 2.5;
+      const iv = rec.intervalDays || 0;
+      const reps = rec.reps || 0;
+
+      // Again: セッション内再出題 (<1分)
+      const againDays = 1 / 1440;
+      // Hard
+      const hardDays = reps === 0 ? 0.25 : Math.max(0.5, +(iv * 1.2).toFixed(2));
+      // Good
+      let goodDays = 1;
+      if (reps === 1) goodDays = 3;
+      else if (reps >= 2) goodDays = Math.max(1, +(iv * ease).toFixed(1));
+      // Easy
+      const easyDays = reps === 0 ? 4 : Math.max(4, +(iv * ease * 1.35).toFixed(1));
+
+      return {
+        again: againDays,
+        hard: hardDays,
+        good: goodDays,
+        easy: easyDays
+      };
+    }
+
+    function formatInterval(days) {
+      if (days < 1 / 24) {
+        return "再出題 (<1分)";
+      }
+      if (days < 1) {
+        const hours = Math.max(1, Math.round(days * 24));
+        return `${hours}時間`;
+      }
+      const rounded = days >= 10 ? Math.round(days) : +days.toFixed(1);
+      return `${rounded}日`;
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    /* =========================================================================
+     * 5. 学習キュー構築・問題描画・回答入力制御
+     * ========================================================================= */
+    function getFilteredPool() {
+      if (!activeCategoryFilter) return questionsPool;
+      return questionsPool.filter((q) => q.category === activeCategoryFilter);
+    }
+
+    function buildStudyQueue() {
+      const now = Date.now();
+      const pool = getFilteredPool();
+
+      if (studyMode === "all") {
+        studyQueue = shuffleArray(pool);
+      } else if (studyMode === "weak") {
+        const weakCards = pool.filter((q) => {
+          const rec = getCardRecord(q.id);
+          return rec.lapses > 0 || (rec.attemptTotal > 0 && rec.correctTotal < rec.attemptTotal);
+        });
+        weakCards.sort((a, b) => {
+          const ra = getCardRecord(a.id);
+          const rb = getCardRecord(b.id);
+          const accA = ra.attemptTotal ? ra.correctTotal / ra.attemptTotal : 1;
+          const accB = rb.attemptTotal ? rb.correctTotal / rb.attemptTotal : 1;
+          return accA - accB || rb.lapses - ra.lapses;
+        });
+        studyQueue = weakCards;
+      } else {
+        // 通常学習 ('due'): 期限到来復習カード + 未学習新規カード
+        const dueReviews = [];
+        const newCards = [];
+        pool.forEach((q) => {
+          const rec = getCardRecord(q.id);
+          if (rec.attemptTotal === 0) {
+            newCards.push(q);
+          } else if (rec.dueAt <= now) {
+            dueReviews.push(q);
+          }
+        });
+        dueReviews.sort((a, b) => getCardRecord(a.id).dueAt - getCardRecord(b.id).dueAt);
+        studyQueue = [...dueReviews, ...shuffleArray(newCards)];
+      }
+    }
+
+    function loadNextQuestion() {
+      updateDashboardStats();
+
+      const activeView = document.getElementById("quizActiveView");
+      const completeView = document.getElementById("quizCompleteView");
+      const clearFilterBtn = document.getElementById("btnClearCatFilter");
+
+      if (studyQueue.length === 0) {
+        currentQuestion = null;
+        activeView.style.display = "none";
+        completeView.classList.add("visible");
+        clearFilterBtn.style.display = activeCategoryFilter ? "inline-flex" : "none";
+
+        const msgEl = document.getElementById("completeMessage");
+        if (studyMode === "weak") {
+          msgEl.textContent = "現在、誤答履歴やAgain評価のある苦手問題はありません。全問演習モードでさらなる定着を図りましょう！";
+        } else {
+          msgEl.textContent = "現在の条件における未学習・復習期限到来カードをすべて消化しました。全問演習モードまたは別カテゴリで継続学習できます。";
+        }
+        return;
+      }
+
+      activeView.style.display = "block";
+      completeView.classList.remove("visible");
+
+      currentQuestion = studyQueue[0];
+      quizPhase = "answering";
+      lastIsCorrect = false;
+      selectedAnswers.clear();
+      openRegions.clear();
+
+      renderCurrentQuestion();
+      updateDashboardStats();
+    }
+
+    function renderCurrentQuestion() {
+      const q = currentQuestion;
+      if (!q) return;
+
+      const rec = getCardRecord(q.id);
+
+      // トップバーバッジ
+      document.getElementById("qCategoryBadge").textContent = q.category;
+      document.getElementById("qTypeBadge").textContent =
+        q.targetType === "power_company"
+          ? "タイプA：電力会社（単一選択）"
+          : "タイプB：都道府県（単一/複数・完答判定）";
+      document.getElementById("qIdBadge").textContent = `#${q.id}`;
+
+      const srsBadge = document.getElementById("qSrsBadge");
+      srsBadge.classList.remove("weak");
+      if (rec.attemptTotal === 0) {
+        srsBadge.textContent = "新規";
+      } else if (rec.lapses >= 2 || rec.lastRating === "again") {
+        srsBadge.textContent = `要強化 (誤答:${rec.lapses})`;
+        srsBadge.classList.add("weak");
+      } else {
+        const rate = Math.round((rec.correctTotal / rec.attemptTotal) * 100);
+        srsBadge.textContent = `正答率 ${rate}% (${rec.correctTotal}/${rec.attemptTotal})`;
+      }
+
+      // 問題文
+      document.getElementById("qQuestionText").textContent = q.question;
+
+      // 出題ビジュアル（内蔵SVG即時描画 + 外部画像フォールバック機構）
+      const svgContainer = document.getElementById("svgFallbackContainer");
+      const extImg = document.getElementById("externalQuestionImg");
+      const toggleBtn = document.getElementById("btnToggleVisualSource");
+
+      svgContainer.innerHTML = renderMetaSVG(q);
+      svgContainer.style.display = "block";
+      extImg.classList.remove("loaded");
+      extImg.style.display = "none";
+      toggleBtn.style.display = "none";
+      showingExternalPhoto = false;
+
+      if (q.imageUrl && String(q.imageUrl).trim() !== "") {
+        extImg.onload = () => {
+          // 該当問題が現在表示中の場合のみ実画像へ切替
+          if (currentQuestion && currentQuestion.id === q.id) {
+            extImg.classList.add("loaded");
+            extImg.style.display = "block";
+            svgContainer.style.display = "none";
+            showingExternalPhoto = true;
+            toggleBtn.style.display = "inline-block";
+            toggleBtn.textContent = "SVG図解を表示";
+          }
+        };
+        extImg.onerror = () => {
+          // 外部URL切れ・オフライン時は内蔵SVGフォールバックを維持
+          extImg.classList.remove("loaded");
+          extImg.style.display = "none";
+          svgContainer.style.display = "block";
+          showingExternalPhoto = false;
+          toggleBtn.style.display = "none";
+        };
+        extImg.src = q.imageUrl;
+      }
+
+      // 結果パネル・凡例初期化
+      document.getElementById("diffLegend").classList.remove("visible");
+      document.getElementById("resultPanel").classList.remove("visible");
+      document.getElementById("submitBar").style.display = "flex";
+
+      // 回答入力UIの切替
+      const typeAContainer = document.getElementById("typeAContainer");
+      const typeBContainer = document.getElementById("typeBContainer");
+      const prefQuickTools = document.getElementById("prefQuickTools");
+      const instructionEl = document.getElementById("answerInstruction");
+
+      if (q.targetType === "power_company") {
+        instructionEl.textContent = "該当する電力会社を1つ選択して「回答する」を押してください。";
+        prefQuickTools.style.display = "none";
+        typeBContainer.style.display = "none";
+        typeAContainer.style.display = "grid";
+        renderTypeAPowerGrid();
+      } else {
+        instructionEl.textContent = "該当する都道府県をすべて選択してください（過不足なしの完全一致で正解）。";
+        prefQuickTools.style.display = "flex";
+        typeAContainer.style.display = "none";
+        typeBContainer.style.display = "flex";
+        renderTypeBRegionsAccordion();
+      }
+    }
+
+    function renderTypeAPowerGrid() {
+      const container = document.getElementById("typeAContainer");
+      container.innerHTML = "";
+      const isLocked = quizPhase === "reviewed";
+      const correctSet = new Set(currentQuestion.correctAnswers);
+
+      POWER_COMPANIES.forEach((company) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "power-btn";
+        btn.disabled = isLocked;
+
+        if (!isLocked) {
+          if (selectedAnswers.has(company)) {
+            btn.classList.add("selected");
+          }
+          btn.addEventListener("click", () => {
+            selectedAnswers.clear();
+            selectedAnswers.add(company);
+            renderTypeAPowerGrid();
+          });
+        } else {
+          const isSelected = selectedAnswers.has(company);
+          const isCorrect = correctSet.has(company);
+          if (isCorrect) {
+            btn.classList.add("state-correct");
+          } else if (isSelected && !isCorrect) {
+            btn.classList.add("state-wrong");
+          }
+        }
+
+        const labelSpan = document.createElement("span");
+        labelSpan.textContent = company;
+        btn.appendChild(labelSpan);
+
+        container.appendChild(btn);
+      });
+    }
+
+    function renderTypeBRegionsAccordion() {
+      const container = document.getElementById("typeBContainer");
+      container.innerHTML = "";
+      const isLocked = quizPhase === "reviewed";
+      const correctSet = new Set(currentQuestion.correctAnswers);
+
+      document.getElementById("prefSelectedCounter").textContent = `選択中: ${selectedAnswers.size} 都道府県`;
+
+      REGIONS.forEach((region) => {
+        const selectedInRegion = region.prefs.filter((p) => selectedAnswers.has(p)).length;
+        const allSelectedInRegion = selectedInRegion === region.prefs.length;
+        const isOpen = openRegions.has(region.name);
+
+        const regionDiv = document.createElement("div");
+        regionDiv.className = "region-item" + (isOpen ? " open" : "") + (selectedInRegion > 0 ? " has-selection" : "");
+
+        // 地方ヘッダー
+        const header = document.createElement("div");
+        header.className = "region-header";
+        header.addEventListener("click", () => {
+          if (openRegions.has(region.name)) {
+            openRegions.delete(region.name);
+          } else {
+            openRegions.add(region.name);
+          }
+          renderTypeBRegionsAccordion();
+        });
+
+        const left = document.createElement("div");
+        left.className = "region-left";
+        left.innerHTML = `
+          <span class="region-chevron">▶</span>
+          <span class="region-name">${escapeHtml(region.name)}</span>
+          <span class="region-count-pill ${selectedInRegion > 0 ? "active" : ""}">
+            ${selectedInRegion} / ${region.prefs.length} 選択
+          </span>
+        `;
+
+        // 地方全選択 / 解除ボタン
+        const bulkBtn = document.createElement("button");
+        bulkBtn.type = "button";
+        bulkBtn.className = "btn-region-toggle";
+        bulkBtn.disabled = isLocked;
+        bulkBtn.textContent = allSelectedInRegion ? "地方 全解除" : "地方 全選択";
+        bulkBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (isLocked) return;
+          if (allSelectedInRegion) {
+            region.prefs.forEach((p) => selectedAnswers.delete(p));
+          } else {
+            region.prefs.forEach((p) => selectedAnswers.add(p));
+            openRegions.add(region.name);
+          }
+          renderTypeBRegionsAccordion();
+        });
+
+        header.appendChild(left);
+        header.appendChild(bulkBtn);
+
+        // 都道府県チェックボックス付きバッジ群
+        const body = document.createElement("div");
+        body.className = "region-body";
+
+        region.prefs.forEach((pref) => {
+          const isChecked = selectedAnswers.has(pref);
+          const isTarget = correctSet.has(pref);
+
+          const label = document.createElement("label");
+          label.className = "pref-badge";
+          if (isChecked) label.classList.add("checked");
+          if (isLocked) label.classList.add("locked");
+
+          let diffTagHtml = "";
+          if (isLocked) {
+            if (isChecked && isTarget) {
+              label.classList.add("diff-hit");
+              diffTagHtml = `<span class="diff-tag">一致</span>`;
+            } else if (isChecked && !isTarget) {
+              label.classList.add("diff-extra");
+              diffTagHtml = `<span class="diff-tag">過剰</span>`;
+            } else if (!isChecked && isTarget) {
+              label.classList.add("diff-missed");
+              diffTagHtml = `<span class="diff-tag">見落とし</span>`;
+            }
+          }
+
+          label.innerHTML = `
+            <input type="checkbox" ${isChecked ? "checked" : ""} ${isLocked ? "disabled" : ""} tabindex="-1" />
+            <span>${escapeHtml(pref)}</span>
+            ${diffTagHtml}
+          `;
+
+          if (!isLocked) {
+            label.addEventListener("click", (e) => {
+              e.preventDefault();
+              if (selectedAnswers.has(pref)) {
+                selectedAnswers.delete(pref);
+              } else {
+                selectedAnswers.add(pref);
+              }
+              renderTypeBRegionsAccordion();
+            });
+          }
+
+          body.appendChild(label);
+        });
+
+        regionDiv.appendChild(header);
+        regionDiv.appendChild(body);
+        container.appendChild(regionDiv);
+      });
+    }
+
+    /* =========================================================================
+     * 6. 回答判定（完全一致チェック・過不足可視化）＆ Anki復習度評価
+     * ========================================================================= */
+    function submitAnswer() {
+      if (!currentQuestion || quizPhase !== "answering") return;
+
+      if (selectedAnswers.size === 0) {
+        showToast("⚠️ 選択肢を1つ以上選択してから回答してください");
+        return;
+      }
+
+      quizPhase = "reviewed";
+      const q = currentQuestion;
+      const correctSet = new Set(q.correctAnswers);
+
+      // 完全一致判定（過不足なし）
+      const hits = [...selectedAnswers].filter((ans) => correctSet.has(ans));
+      const extras = [...selectedAnswers].filter((ans) => !correctSet.has(ans));
+      const missed = [...correctSet].filter((ans) => !selectedAnswers.has(ans));
+      const isCorrect = extras.length === 0 && missed.length === 0 && hits.length === correctSet.size;
+      lastIsCorrect = isCorrect;
+
+      // セッション＆カード累計記録更新
+      sessionStats.total += 1;
+      if (isCorrect) sessionStats.correct += 1;
+
+      const rec = getCardRecord(q.id);
+      rec.attemptTotal += 1;
+      if (isCorrect) {
+        rec.correctTotal += 1;
+      } else {
+        rec.lapses += 1;
+      }
+      saveSrsState();
+
+      // 都道府県問題の場合は、選択県または正解県が含まれる地方を自動展開して色分けを即座に可視化
+      if (q.targetType === "prefecture") {
+        REGIONS.forEach((region) => {
+          const hasRelevant = region.prefs.some((p) => selectedAnswers.has(p) || correctSet.has(p));
+          if (hasRelevant) openRegions.add(region.name);
+        });
+        document.getElementById("diffLegend").classList.add("visible");
+        renderTypeBRegionsAccordion();
+      } else {
+        renderTypeAPowerGrid();
+      }
+
+      // 送信ボタンを隠し、結果＆解説・Ankiボタンを表示
+      document.getElementById("submitBar").style.display = "none";
+
+      const banner = document.getElementById("resultBanner");
+      banner.className = "result-banner " + (isCorrect ? "correct" : "incorrect");
+
+      document.getElementById("resultVerdict").textContent = isCorrect
+        ? "✅ 正解！（完全一致）"
+        : "❌ 不正解";
+
+      if (q.targetType === "prefecture") {
+        document.getElementById("resultSummarySub").textContent =
+          `一致: ${hits.length} / 過剰選択: ${extras.length} / 見落とし: ${missed.length}`;
+      } else {
+        const picked = [...selectedAnswers][0] || "未選択";
+        document.getElementById("resultSummarySub").textContent = `あなたの回答: ${picked}`;
+      }
+
+      // 正解ピル一覧
+      const pillsBox = document.getElementById("correctAnswerPills");
+      pillsBox.innerHTML = q.correctAnswers
+        .map((ans) => `<span class="correct-pill">${escapeHtml(ans)}</span>`)
+        .join("");
+
+      // 解説テキスト
+      document.getElementById("explanationText").textContent = q.explanation;
+
+      // Anki次回間隔ラベル計算と推奨ハイライト
+      const schedules = computeNextSchedules(rec);
+      document.getElementById("ivAgain").textContent = formatInterval(schedules.again);
+      document.getElementById("ivHard").textContent = formatInterval(schedules.hard);
+      document.getElementById("ivGood").textContent = formatInterval(schedules.good);
+      document.getElementById("ivEasy").textContent = formatInterval(schedules.easy);
+
+      const recommendedRating = isCorrect ? "good" : "again";
+      document.querySelectorAll(".anki-btn").forEach((btn) => {
+        btn.classList.toggle("recommended", btn.dataset.rating === recommendedRating);
+      });
+
+      const resultPanel = document.getElementById("resultPanel");
+      resultPanel.classList.add("visible");
+
+      updateDashboardStats();
+    }
+
+    function applyAnkiRating(rating) {
+      if (!currentQuestion || quizPhase !== "reviewed") return;
+
+      const q = currentQuestion;
+      const rec = getCardRecord(q.id);
+      const schedules = computeNextSchedules(rec);
+      const now = Date.now();
+      const dayMs = 24 * 60 * 60 * 1000;
+
+      // 現在の先頭問題を取り出す
+      studyQueue.shift();
+
+      if (rating === "again") {
+        rec.reps = 0;
+        rec.intervalDays = schedules.again;
+        rec.ease = Math.max(1.3, (rec.ease || 2.5) - 0.2);
+        rec.dueAt = now + 60 * 1000;
+        rec.lastRating = "again";
+        // セッション内ですぐ復習できるよう数問後ろへ再挿入
+        const reinsertIdx = Math.min(studyQueue.length, 3);
+        studyQueue.splice(reinsertIdx, 0, q);
+      } else if (rating === "hard") {
+        rec.intervalDays = schedules.hard;
+        rec.ease = Math.max(1.3, (rec.ease || 2.5) - 0.15);
+        rec.reps = Math.max(1, rec.reps);
+        rec.dueAt = now + Math.round(schedules.hard * dayMs);
+        rec.lastRating = "hard";
+      } else if (rating === "good") {
+        rec.intervalDays = schedules.good;
+        rec.reps += 1;
+        rec.dueAt = now + Math.round(schedules.good * dayMs);
+        rec.lastRating = "good";
+      } else if (rating === "easy") {
+        rec.intervalDays = schedules.easy;
+        rec.ease = (rec.ease || 2.5) + 0.15;
+        rec.reps += 1;
+        rec.dueAt = now + Math.round(schedules.easy * dayMs);
+        rec.lastRating = "easy";
+      }
+
+      saveSrsState();
+      loadNextQuestion();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* =========================================================================
+     * 7. 常時表示ダッシュボード（セッション正答率・残り問題数・カテゴリ別正答率）
+     * ========================================================================= */
+    function updateDashboardStats() {
+      // セッション正答率
+      const rateEl = document.getElementById("statSessionRate");
+      const detailEl = document.getElementById("statSessionDetail");
+      if (sessionStats.total === 0) {
+        rateEl.textContent = "--%";
+      } else {
+        const pct = ((sessionStats.correct / sessionStats.total) * 100).toFixed(1);
+        rateEl.textContent = `${pct}%`;
+      }
+      detailEl.textContent = `${sessionStats.correct} / ${sessionStats.total} 問正解`;
+
+      // 残り問題数
+      const pool = getFilteredPool();
+      document.getElementById("statRemainingCount").textContent = String(studyQueue.length);
+      document.getElementById("statTotalPool").textContent = `対象 全 ${pool.length} 問`;
+
+      // SRS内訳（全問題対象）
+      const now = Date.now();
+      let newCnt = 0;
+      let dueCnt = 0;
+      let masteredCnt = 0;
+      pool.forEach((q) => {
+        const r = getCardRecord(q.id);
+        if (r.attemptTotal === 0) newCnt++;
+        else if (r.dueAt <= now) dueCnt++;
+        else masteredCnt++;
+      });
+      document.getElementById("srsNewCount").textContent = String(newCnt);
+      document.getElementById("srsDueCount").textContent = String(dueCnt);
+      document.getElementById("srsMasteredCount").textContent = String(masteredCnt);
+
+      // フィルタ表示ラベル
+      document.getElementById("activeFilterLabel").textContent = activeCategoryFilter || "全カテゴリ";
+      document.getElementById("btnResetCatFilter").style.display = activeCategoryFilter ? "inline-flex" : "none";
+
+      // カテゴリ別正答率（7カテゴリ常時表示）
+      const catListEl = document.getElementById("categoryStatsList");
+      catListEl.innerHTML = "";
+
+      CATEGORIES.forEach((cat) => {
+        const catQuestions = questionsPool.filter((q) => q.category === cat);
+        let catAttempts = 0;
+        let catCorrect = 0;
+        catQuestions.forEach((q) => {
+          const r = getCardRecord(q.id);
+          catAttempts += r.attemptTotal;
+          catCorrect += r.correctTotal;
+        });
+
+        const pctNum = catAttempts > 0 ? Math.round((catCorrect / catAttempts) * 100) : 0;
+        const pctText = catAttempts > 0 ? `${pctNum}% (${catCorrect}/${catAttempts})` : `--% (0/0)`;
+
+        const item = document.createElement("div");
+        item.className = "cat-stat-item" + (activeCategoryFilter === cat ? " active-filter" : "");
+        item.title = "クリックでこのカテゴリのみ集中出題（再クリックで解除）";
+        item.innerHTML = `
+          <div class="cat-stat-top">
+            <span class="cat-stat-name">${escapeHtml(cat)}</span>
+            <span class="cat-stat-rate">${pctText}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: ${pctNum}%;"></div>
+          </div>
+        `;
+        item.addEventListener("click", () => {
+          activeCategoryFilter = activeCategoryFilter === cat ? null : cat;
+          buildStudyQueue();
+          loadNextQuestion();
+        });
+
+        catListEl.appendChild(item);
+      });
+    }
+
+    /* =========================================================================
+     * 8. イベントリスナー・キーボードショートカット・モーダル制御
+     * ========================================================================= */
+    function showToast(message) {
+      const toast = document.getElementById("toastMsg");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    function isAnyModalOpen() {
+      return (
+        document.getElementById("zoomModal").classList.contains("open") ||
+        document.getElementById("dataModal").classList.contains("open")
+      );
+    }
+
+    function setupEventListeners() {
+      // 回答ボタン
+      document.getElementById("btnSubmitAnswer").addEventListener("click", submitAnswer);
+
+      // Anki 4段階評価ボタン
+      document.querySelectorAll(".anki-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          applyAnkiRating(btn.dataset.rating);
+        });
+      });
+
+      // 地方一括開閉 ＆ 都道府県選択クリア
+      document.getElementById("btnExpandAllRegions").addEventListener("click", () => {
+        if (openRegions.size === REGIONS.length) {
+          openRegions.clear();
+        } else {
+          REGIONS.forEach((r) => openRegions.add(r.name));
+        }
+        renderTypeBRegionsAccordion();
+      });
+
+      document.getElementById("btnClearPrefSelection").addEventListener("click", () => {
+        if (quizPhase !== "answering") return;
+        selectedAnswers.clear();
+        renderTypeBRegionsAccordion();
+      });
+
+      // 出題モード変更
+      const modeSelect = document.getElementById("studyModeSelect");
+      modeSelect.addEventListener("change", () => {
+        studyMode = modeSelect.value;
+        buildStudyQueue();
+        loadNextQuestion();
+      });
+
+      // 完了画面からの再開ボタン
+      document.getElementById("btnContinueAll").addEventListener("click", () => {
+        studyMode = "all";
+        modeSelect.value = "all";
+        buildStudyQueue();
+        loadNextQuestion();
+      });
+
+      document.getElementById("btnContinueWeak").addEventListener("click", () => {
+        studyMode = "weak";
+        modeSelect.value = "weak";
+        buildStudyQueue();
+        loadNextQuestion();
+      });
+
+      document.getElementById("btnClearCatFilter").addEventListener("click", () => {
+        activeCategoryFilter = null;
+        buildStudyQueue();
+        loadNextQuestion();
+      });
+
+      document.getElementById("btnResetCatFilter").addEventListener("click", () => {
+        activeCategoryFilter = null;
+        buildStudyQueue();
+        loadNextQuestion();
+      });
+
+      // 実画像 / SVG図解 表示切替
+      document.getElementById("btnToggleVisualSource").addEventListener("click", () => {
+        const svgContainer = document.getElementById("svgFallbackContainer");
+        const extImg = document.getElementById("externalQuestionImg");
+        const toggleBtn = document.getElementById("btnToggleVisualSource");
+        showingExternalPhoto = !showingExternalPhoto;
+        if (showingExternalPhoto) {
+          extImg.style.display = "block";
+          svgContainer.style.display = "none";
+          toggleBtn.textContent = "SVG図解を表示";
+        } else {
+          extImg.style.display = "none";
+          svgContainer.style.display = "block";
+          toggleBtn.textContent = "実画像を表示";
+        }
+      });
+
+      // ビジュアル拡大モーダル
+      const zoomModal = document.getElementById("zoomModal");
+      document.getElementById("btnZoomVisual").addEventListener("click", () => {
+        if (!currentQuestion) return;
+        const zoomContent = document.getElementById("zoomModalContent");
+        const extImg = document.getElementById("externalQuestionImg");
+        if (showingExternalPhoto && extImg.classList.contains("loaded")) {
+          zoomContent.innerHTML = `<img src="${escapeHtml(extImg.src)}" alt="拡大画像" />`;
+        } else {
+          zoomContent.innerHTML = renderMetaSVG(currentQuestion);
+        }
+        zoomModal.classList.add("open");
+      });
+
+      document.getElementById("btnCloseZoomModal").addEventListener("click", () => {
+        zoomModal.classList.remove("open");
+      });
+      zoomModal.addEventListener("click", (e) => {
+        if (e.target === zoomModal) zoomModal.classList.remove("open");
+      });
+
+      // 問題データJSONモーダル
+      const dataModal = document.getElementById("dataModal");
+      const jsonEditor = document.getElementById("jsonEditorArea");
+
+      document.getElementById("btnOpenDataModal").addEventListener("click", () => {
+        jsonEditor.value = JSON.stringify(questionsPool, null, 2);
+        dataModal.classList.add("open");
+      });
+
+      document.getElementById("btnCloseDataModal").addEventListener("click", () => {
+        dataModal.classList.remove("open");
+      });
+      dataModal.addEventListener("click", (e) => {
+        if (e.target === dataModal) dataModal.classList.remove("open");
+      });
+
+      document.getElementById("btnApplyCustomData").addEventListener("click", () => {
+        try {
+          const parsed = JSON.parse(jsonEditor.value);
+          if (!Array.isArray(parsed) || parsed.length === 0) {
+            throw new Error("配列形式の問題データを1件以上入力してください。");
+          }
+          for (const item of parsed) {
+            if (!item.id || !item.category || !item.question || !Array.isArray(item.correctAnswers)) {
+              throw new Error(`必須キー（id, category, question, correctAnswers）が不足しています: ${JSON.stringify(item)}`);
+            }
+            if (!CATEGORIES.includes(item.category)) {
+              throw new Error(`対象外のカテゴリ名です: ${item.category}`);
+            }
+            if (item.targetType !== "power_company" && item.targetType !== "prefecture") {
+              throw new Error(`targetType は 'power_company' または 'prefecture' を指定してください: ${item.id}`);
+            }
+          }
+          questionsPool = parsed;
+          localStorage.setItem(STORAGE_KEY_CUSTOM_Q, JSON.stringify(parsed));
+          dataModal.classList.remove("open");
+          buildStudyQueue();
+          loadNextQuestion();
+          showToast("✅ 問題データJSONを反映しました");
+        } catch (err) {
+          alert("JSONデータの検証エラー:\n" + err.message);
+        }
+      });
+
+      document.getElementById("btnRestoreDefaultData").addEventListener("click", () => {
+        localStorage.removeItem(STORAGE_KEY_CUSTOM_Q);
+        questionsPool = structuredCloneData(DEFAULT_QUESTIONS_DATA);
+        jsonEditor.value = JSON.stringify(questionsPool, null, 2);
+        buildStudyQueue();
+        loadNextQuestion();
+        showToast("初期問題データベースに復元しました");
+      });
+
+      // 学習進捗リセット
+      document.getElementById("btnResetProgress").addEventListener("click", () => {
+        if (!confirm("保存されている復習間隔・苦手記録・セッション正答率をすべてリセットしますか？")) {
+          return;
+        }
+        srsState = {};
+        localStorage.removeItem(STORAGE_KEY_SRS);
+        sessionStats = { correct: 0, total: 0 };
+        buildStudyQueue();
+        loadNextQuestion();
+        showToast("学習進捗をリセットしました");
+      });
+
+      // キーボードショートカット（Space / Enter / 1〜4 / Esc）
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          document.getElementById("zoomModal").classList.remove("open");
+          document.getElementById("dataModal").classList.remove("open");
+          return;
+        }
+
+        if (isAnyModalOpen()) return;
+
+        const activeTag = document.activeElement ? document.activeElement.tagName : "";
+        if (activeTag === "TEXTAREA" || activeTag === "SELECT") return;
+
+        if (e.code === "Space" || e.key === "Enter") {
+          if (!currentQuestion) return;
+          e.preventDefault();
+          if (quizPhase === "answering") {
+            submitAnswer();
+          } else if (quizPhase === "reviewed") {
+            applyAnkiRating(lastIsCorrect ? "good" : "again");
+          }
+          return;
+        }
+
+        if (quizPhase === "reviewed") {
+          if (e.key === "1") {
+            e.preventDefault();
+            applyAnkiRating("again");
+          } else if (e.key === "2") {
+            e.preventDefault();
+            applyAnkiRating("hard");
+          } else if (e.key === "3") {
+            e.preventDefault();
+            applyAnkiRating("good");
+          } else if (e.key === "4") {
+            e.preventDefault();
+            applyAnkiRating("easy");
+          }
+        }
+      });
+    }
+
+    // 初期化実行
+    setupEventListeners();
+    buildStudyQueue();
+    loadNextQuestion();
+  </script>
+</body>
+</html>

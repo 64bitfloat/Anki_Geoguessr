@@ -1262,6 +1262,9 @@
               <div class="explanation-box">
                 <div class="box-label" style="color:var(--accent);">解説・着眼点（メタの特徴）</div>
                 <div id="explanationText"></div>
+                <div style="margin-top:8px;font-size:0.76rem;color:var(--text-sub);">
+                  出典: <a href="https://geopinning.space/rule/asia/japan/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GeoGuessrの攻略めも (geopinning.space)</a>
+                </div>
               </div>
 
               <div class="anki-section">
@@ -1356,6 +1359,12 @@
         </div>
         <div id="categoryStatsList" class="cat-stats-list"></div>
       </div>
+
+      <div class="side-card" style="font-size:0.76rem;color:var(--text-sub);line-height:1.6;">
+        問題・画像の出典:<br>
+        <a href="https://geopinning.space/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GeoGuessrの攻略めも (geopinning.space)</a><br>
+        <a href="https://geopinning.space/rule/asia/japan/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">日本のページ</a> の7項目の記載のみから作成。画像は同サイトから読み込みます（オフライン時は原文の記述で出題）。
+      </div>
     </aside>
   </main>
 
@@ -1379,7 +1388,7 @@
       </div>
       <div class="modal-body">
         <p style="font-size:0.84rem;color:var(--text-sub);">
-          問題データは単一配列として定義されています。<code>imageUrl</code> に実画像URLやローカルパスを設定して適用すると実画像が表示され、読み込み失敗・オフライン時は自動的に内蔵SVGメタ図解へフォールバックします。
+          問題データは単一配列として定義されています。<code>imageUrl</code> に実画像URLやローカルパスを設定して適用すると実画像が表示され、読み込み失敗・オフライン時は自動的に内蔵SVG（ガイワイヤーの簡略図、または <code>hint</code> の記述を表示する出題カード）へフォールバックします。
         </p>
         <textarea id="jsonEditorArea" class="json-editor" spellcheck="false"></textarea>
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap;">
@@ -1432,832 +1441,813 @@
     ];
 
     /* =========================================================================
-     * 2. 問題データベース（疎結合JSON互換オブジェクト配列：全30問）
+     * 2. 問題データベース（疎結合JSON互換オブジェクト配列）
+     *    出典: GeoGuessrの攻略めも (geopinning.space) — https://geopinning.space/
+     *    https://geopinning.space/rule/asia/japan/ の以下7項目の記載のみから作成：
+     *    電柱の表示帯 / 電柱ポールトップ / ガイワイヤー（支線）のカバー /
+     *    標識ポールのシール・テープ / 横断歩道のダイヤマーク /
+     *    「止まれ」の路面標示 / 擁壁のブロック模様
+     *    - imageUrl : geopinning.space 上の画像（読込失敗時は hint テキスト／内蔵SVGへフォールバック）
+     *    - hint     : 原文の「見た目」の記述（答えを含む部分は除外）。オフライン時の出題カードに表示
+     *    - svgKey   : 内蔵SVGで描画する図（ガイワイヤーのみ。原文の図と同じ形状）
      * ========================================================================= */
+    const SOURCE_NAME = "GeoGuessrの攻略めも (geopinning.space)";
+    const SOURCE_URL = "https://geopinning.space/rule/asia/japan/";
+
     const DEFAULT_QUESTIONS_DATA = [
-      // --- 1. 電柱の表示帯 ---
+      // ===== 1. 電柱の表示帯（原文：電柱の表示帯で電力会社を見分ける） =====
       {
-        id: "pole_band_01",
-        category: "電柱の表示帯",
-        question: "白地に緑や黒の文字が印字された「縦長の楕円形（オーバル型）」の電柱番号プレートを採用している電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["中部電力"],
-        imageUrl: "./images/pole_band_01.jpg",
-        explanation: "他社が長方形の番号札を採用する中、「縦長の楕円形プレート」は中部電力管内（愛知・岐阜・三重・長野・静岡の富士川以西）を即座に確定できる超重要メタです。"
+        id: "band_tohoku", category: "電柱の表示帯",
+        question: "この電柱の表示帯（イラスト）が使われている電力会社は？",
+        targetType: "power_company", correctAnswers: ["東北電力"],
+        imageUrl: "https://geopinning.space/rule/poles/band/tohoku.webp",
+        hint: "灰色の枠に白い縦縞の表示帯。黄色が入らず、全体に白っぽい。",
+        explanation: "東北電力：灰色の枠に白い縦縞の表示帯。黄色が入らず、全体に白っぽい。（エリア：東北 6 県と新潟県）"
       },
       {
-        id: "pole_band_02",
-        category: "電柱の表示帯",
-        question: "黒地に白または黄文字で「縦書きのカタカナ・漢字」が記された幹線プレートと、外枠のない斜め黒黄反射帯の組み合わせが特徴的な電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["関西電力"],
-        imageUrl: "./images/pole_band_02.jpg",
-        explanation: "関西電力の電柱札は黒背景に縦書き（例：タカマツ・ホンマチ等）の表記が多く、電柱保護の黒黄ストライプ反射シートも外枠がなく斜め縞がはっきりしているのが特徴です。"
+        id: "band_hokuriku", category: "電柱の表示帯",
+        question: "この電柱の表示帯（イラスト）が使われている電力会社は？",
+        targetType: "power_company", correctAnswers: ["北陸電力"],
+        imageUrl: "https://geopinning.space/rule/poles/band/hokuriku.webp",
+        hint: "黄色と黒の帯を電柱に斜めに巻いた、らせん状の表示帯（スパイラル型車避表示帯）。",
+        explanation: "北陸電力：黄色と黒の帯を電柱に斜めに巻いた、らせん状の表示帯（スパイラル型車避表示帯）。（エリア：富山県・石川県、福井県の嶺北と敦賀）"
       },
       {
-        id: "pole_band_03",
-        category: "電柱の表示帯",
-        question: "白い縦長プレートの最上部に「小さな横書き数字（座標）」、その下に「大きな縦書き数字」が整然と並ぶ番号札を持つ電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["北海道電力"],
-        imageUrl: "./images/pole_band_03.jpg",
-        explanation: "北海道電力（ほくでん）の番号札は、上段の小さな数字群が碁盤目状の座標規則を示し、その下に大きな縦数字が続く非常に視認しやすいレイアウトになっています。"
+        id: "band_chubu", category: "電柱の表示帯",
+        question: "この電柱の表示帯（イラスト）が使われている電力会社は？",
+        targetType: "power_company", correctAnswers: ["中部電力"],
+        imageUrl: "https://geopinning.space/rule/poles/band/chubu.webp",
+        hint: "黄色と黒の斜め縞の大きな板。上下に文字がある。",
+        explanation: "中部電力：黄色と黒の斜め縞の大きな板。上下に「電柱に昇らないで下さい」「中部電力まで」の文字がある。（エリア：愛知県・岐阜県・三重県・長野県と、富士川より西の静岡県）"
       },
       {
-        id: "pole_band_04",
-        category: "電柱の表示帯",
-        question: "電柱に巻かれる黒と黄色の反射帯（リフレクター）が、斜め縞ではなく「水平（横向き）のボーダー縞」になっている特徴が見られる電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["北陸電力"],
-        imageUrl: "./images/pole_band_04.jpg",
-        explanation: "北陸電力管内（富山・石川・福井嶺北）では、黄色い反射シートに黒い水平ラインが複数入った「横縞リフレクター」が多用されており、遠目からでも識別可能です。"
+        id: "band_kansai", category: "電柱の表示帯",
+        question: "この電柱の表示帯（イラスト）が使われている電力会社は？",
+        targetType: "power_company", correctAnswers: ["関西電力"],
+        imageUrl: "https://geopinning.space/rule/poles/band/kansai.webp",
+        hint: "けっこう縦長でサイズ大き目。黄色が淡く、上下を細いバンドで留めている。",
+        explanation: "関西電力：けっこう縦長でサイズ大き目。黄色が淡く、上下を細いバンドで留めている。（エリア：近畿 2 府 4 県（三重県を除く）と、福井県の嶺南の西部）"
       },
       {
-        id: "pole_band_05",
-        category: "電柱の表示帯",
-        question: "白いプレートに赤・黄の曲線アクセント（エネルギア系デザイン）や、横書きカタカナの右寄せ表記が見られる電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["中国電力"],
-        imageUrl: "./images/pole_band_05.jpg",
-        explanation: "中国電力管内（鳥取・島根・岡山・広島・山口）では、横書きカタカナが右寄せになったプレートや赤・黄色のロゴ帯が入った管理札、縦に細かい黒黄反射帯がよく見られます。"
+        id: "band_chugoku", category: "電柱の表示帯",
+        question: "この電柱の表示帯（イラスト）が使われている電力会社は？",
+        targetType: "power_company", correctAnswers: ["中国電力"],
+        imageUrl: "https://geopinning.space/rule/poles/band/chugoku.webp",
+        hint: "黄色と黒の表示帯ではなく、オレンジ色の上向き矢印の札（昇降表示札）が目印。足場ボルトも目立つ。",
+        explanation: "中国電力：黄色と黒の表示帯ではなく、オレンジ色の上向き矢印の札（昇降表示札）が目印。足場ボルトも目立つ。（エリア：鳥取県・島根県・岡山県・広島県・山口県）"
       },
       {
-        id: "pole_band_06",
-        category: "電柱の表示帯",
-        question: "プレート上部に四つ葉・クロス状の幾何学エンブレムや緑・青文字の路線記号が入り、独自の四国仕様反射帯と組み合わさる電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["四国電力"],
-        imageUrl: "./images/pole_band_06.jpg",
-        explanation: "四国電力（よんでん）管内では、独特のコーポレート意匠や緑・青系の文字色を用いたコンパクトな電柱札が多く、本州側の中国・関西電力プレートとの識別に有効です。"
+        id: "band_shikoku", category: "電柱の表示帯",
+        question: "この電柱の表示帯（イラスト）が使われている電力会社は？",
+        targetType: "power_company", correctAnswers: ["四国電力"],
+        imageUrl: "https://geopinning.space/rule/poles/band/shikoku.webp",
+        hint: "黒い枠に黄色の縦縞が入った、小さめの表示帯。",
+        explanation: "四国電力：黒い枠に黄色の縦縞が入った、小さめの表示帯。（エリア：四国 4 県）"
+      },
+      {
+        id: "band_kyushu", category: "電柱の表示帯",
+        question: "この電柱の表示帯（イラスト）が使われている電力会社は？",
+        targetType: "power_company", correctAnswers: ["九州電力"],
+        imageUrl: "https://geopinning.space/rule/poles/band/kyushu.webp",
+        hint: "黄色と黒の縦縞に、細かい粒の突起がびっしり付いた表示帯。",
+        explanation: "九州電力：黄色と黒の縦縞に、細かい粒の突起がびっしり付いた表示帯。（エリア：九州 7 県（沖縄県を除く））"
+      },
+      {
+        id: "band_area_tohoku", category: "電柱の表示帯",
+        question: "geopinning.space の表示帯の項で「東北電力」のエリアとして挙げられている県をすべて選択してください。（該当: 7）",
+        targetType: "prefecture",
+        correctAnswers: ["青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "新潟県"],
+        imageUrl: "https://geopinning.space/rule/poles/band/tohoku.webp",
+        hint: "東北電力のエリアは？（灰色の枠に白い縦縞の表示帯）",
+        explanation: "東北電力のエリアは「東北 6 県と新潟県」。表示帯は灰色の枠に白い縦縞で、黄色が入らず全体に白っぽい。※塗りは電力会社のエリアを県単位でおおまかに示したもので、県境の近くには例外がある。"
+      },
+      {
+        id: "band_area_chugoku", category: "電柱の表示帯",
+        question: "geopinning.space の表示帯の項で「中国電力」のエリアとして挙げられている県をすべて選択してください。（該当: 5）",
+        targetType: "prefecture",
+        correctAnswers: ["鳥取県", "島根県", "岡山県", "広島県", "山口県"],
+        imageUrl: "https://geopinning.space/rule/poles/band/chugoku.webp",
+        hint: "中国電力のエリアは？（オレンジ色の上向き矢印の札）",
+        explanation: "中国電力のエリアは「鳥取県・島根県・岡山県・広島県・山口県」。オレンジ色の上向き矢印の札（昇降表示札）が目印。※県境の近くには例外がある。"
+      },
+      {
+        id: "band_area_shikoku", category: "電柱の表示帯",
+        question: "geopinning.space の表示帯の項で「四国電力」のエリアとして挙げられている県をすべて選択してください。（該当: 4）",
+        targetType: "prefecture",
+        correctAnswers: ["徳島県", "香川県", "愛媛県", "高知県"],
+        imageUrl: "https://geopinning.space/rule/poles/band/shikoku.webp",
+        hint: "四国電力のエリアは？（黒い枠に黄色の縦縞の小さめの表示帯）",
+        explanation: "四国電力のエリアは「四国 4 県」。表示帯は黒い枠に黄色の縦縞が入った、小さめのもの。※県境の近くには例外がある。"
+      },
+      {
+        id: "band_area_kyushu", category: "電柱の表示帯",
+        question: "geopinning.space の表示帯の項で「九州電力」のエリアとして挙げられている県をすべて選択してください。（該当: 7）",
+        targetType: "prefecture",
+        correctAnswers: ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県"],
+        imageUrl: "https://geopinning.space/rule/poles/band/kyushu.webp",
+        hint: "九州電力のエリアは？（黄色と黒の縦縞に細かい粒の突起）",
+        explanation: "九州電力のエリアは「九州 7 県（沖縄県を除く）」。表示帯は黄色と黒の縦縞に、細かい粒の突起がびっしり付いたもの。※県境の近くには例外がある。"
       },
 
-      // --- 2. 電柱ポールトップ ---
+      // ===== 2. 電柱ポールトップ（原文：電柱ポールトップの地域差） =====
       {
-        id: "pole_top_01",
-        category: "電柱ポールトップ",
-        question: "電柱最上部に「円錐形（三角コーン・とんがり帽子状）」の金属キャップおよび架空地線支持具が載っている電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["東北電力"],
-        imageUrl: "./images/pole_top_01.jpg",
-        explanation: "東北電力管内（東北6県＋新潟県）の電柱頂部には、着雪対策も兼ねた円錐形（コーン型）のキャップ構造が高頻度で見られ、北関東との県境判別でも極めて強力です。"
+        id: "top_hokkaido", category: "電柱ポールトップ",
+        question: "この電柱・電線の設備が見られる電力会社は？",
+        targetType: "power_company", correctAnswers: ["北海道電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/hokkaido.webp",
+        hint: "低圧スペーサー・相間スペーサ・ねじれ防止ダンパーといったギャロッピング現象を防止する仕組みが電線に見られる。",
+        explanation: "北海道電力：低圧スペーサー・相間スペーサ・ねじれ防止ダンパーといったギャロッピング現象を防止する仕組みが電線に見られる。雪や寒さ対策があれば北海道（を含む寒い地域）と覚えておけばok。"
       },
       {
-        id: "pole_top_02",
-        category: "電柱ポールトップ",
-        question: "電柱頂部の架空地線アームが、漢字の「並」の下部のような「二股U字フレーム状」に天端を跨いで固定されている電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["東京電力"],
-        imageUrl: "./images/pole_top_02.jpg",
-        explanation: "東京電力（TEPCO）管内（関東1都6県・山梨・静岡の富士川以東）では、2本の支柱が天端を挟み上部で水平に繋がる独特のU字／並字型ポールトップが標準的です。"
+        id: "top_hokuriku", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？",
+        targetType: "power_company", correctAnswers: ["北陸電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/hokuriku.webp",
+        hint: "金具の穴が 2 か所に空いて、トンネルのようになっている。",
+        explanation: "北陸電力：中部電力は4か所に穴が空いているが、北陸電力は2か所に空いてトンネルのようになっている。（エリア：富山県・石川県、福井県の嶺北と敦賀）"
       },
       {
-        id: "pole_top_03",
-        category: "電柱ポールトップ",
-        question: "電柱最上部から真上に向かって「細長い鋭角A字型（二等辺三角形）」の金属フレームが伸びている電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["中部電力"],
-        imageUrl: "./images/pole_top_03.jpg",
-        explanation: "中部電力の架空地線支持具は、左右から斜めに細長いアングル材が合わさるシャープな「A字型」が特徴で、空を見上げるだけで中部電力管内と特定できます。"
+        id: "top_tokyo", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？",
+        targetType: "power_company", correctAnswers: ["東京電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/kanto.webp",
+        hint: "「並」から点を抜いたような形の架空地線腕金。",
+        explanation: "東京電力：「並」から点を抜いたような形の架空地線腕金。（エリア：関東 1 都 6 県・山梨県と、富士川より東の静岡県）"
       },
       {
-        id: "pole_top_04",
-        category: "電柱ポールトップ",
-        question: "電柱最上部の金属キャップ側面に「丸い肉抜き穴が縦に2つ並んだ台形・トンネル状」の金具が付いている電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["北陸電力"],
-        imageUrl: "./images/pole_top_04.jpg",
-        explanation: "北陸電力特有の架空地線キャップには丸穴が縦に2つ空いた独特のプレス金具が使われており、岐阜・長野・新潟・滋賀との境界付近で絶大な威力を発揮します。"
+        id: "top_chubu_1", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？",
+        targetType: "power_company", correctAnswers: ["中部電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/chubu.webp",
+        hint: "細長い A 字形の金具。または、上の棒が出っ張らない四角い枠の形。",
+        explanation: "中部電力：細長い A 字形の金具。関東に似た四角い枠の形もあるが、上の棒は出っ張らない。（エリア：愛知県・岐阜県・三重県・長野県と、富士川より西の静岡県）"
       },
       {
-        id: "pole_top_05",
-        category: "電柱ポールトップ",
-        question: "電柱の頂部から斜め外側へ「約120度の鈍角（くの字型）」に大きく折れ曲がった1本腕の架空地線アームが伸びる電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["関西電力"],
-        imageUrl: "./images/pole_top_05.jpg",
-        explanation: "関西電力（近畿2府4県および福井県嶺南・三重県熊野周辺の一部）では、約120度に曲がった片持ちのアームが電柱最上部から斜め上に突き出すシルエットが定番です。"
+        id: "top_chubu_2", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？（別パターン）",
+        targetType: "power_company", correctAnswers: ["中部電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/chubu-2.webp",
+        hint: "細長い A 字形の金具。または、上の棒が出っ張らない四角い枠の形。",
+        explanation: "中部電力：細長い A 字形の金具。関東に似た四角い枠の形もあるが、上の棒は出っ張らない。（エリア：愛知県・岐阜県・三重県・長野県と、富士川より西の静岡県）"
       },
       {
-        id: "pole_top_06",
-        category: "電柱ポールトップ",
-        question: "台風・塩害対策のため上部の架空地線ツノを持たず、太いコンクリート柱頂部付近に「十字（＋）状」の短い腕金と耐塩がいしを直付けする電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["沖縄電力"],
-        imageUrl: "./images/pole_top_06.jpg",
-        explanation: "沖縄電力管内では猛烈な台風と塩害に耐えるため、細長いポールトップ金具を省き、太い電柱天端にコンパクトな腕金と白い耐塩皿がいしを強固に固定する構造が多く見られます。"
-      },
-
-      // --- 3. ガイワイヤー（支線）のカバー ---
-      {
-        id: "guy_wire_01",
-        category: "ガイワイヤー（支線）のカバー",
-        question: "下半分が太く、途中から上が細くなる「ボトル型（段付き形状）」の黄色カバーに、黒い螺旋テープが巻かれている仕様が代表的な電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["関西電力"],
-        imageUrl: "./images/guy_wire_01.jpg",
-        explanation: "下が太く上が細い段付き「ボトル型」に黒スパイラルが巻かれた支線ガードは関西電力エリア（および隣接する西日本一部）の象徴的なインフラ特徴のひとつです。"
+        id: "top_kansai_1", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？",
+        targetType: "power_company", correctAnswers: ["関西電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/kansai.webp",
+        hint: "120度に曲がった腕金。架空地線腕金の上部の横棒が細い。",
+        explanation: "関西電力：120度に曲がった腕金。視認性が高い関西確定の強力なヒント。架空地線腕金の上部の横棒が細いのも手掛かり。（エリア：近畿 2 府 4 県（三重県を除く）と、福井県の嶺南の西部）"
       },
       {
-        id: "guy_wire_02",
-        category: "ガイワイヤー（支線）のカバー",
-        question: "円筒形の黄色い支線プロテクター表面に、螺旋ではなく「黒と黄色の縦縞（縦方向ストライプ）」が入っている本州の電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["中部電力"],
-        imageUrl: "./images/guy_wire_02.jpg",
-        explanation: "中部電力管内では、斜めのトラ模様ではなく「縦方向に黒いラインが走る縦縞の支線カバー」が広く採用されており、東京電力や関西電力との見分けに直結します。"
+        id: "top_kansai_2", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？（別パターン）",
+        targetType: "power_company", correctAnswers: ["関西電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/kansai-2.webp",
+        hint: "120度に曲がった腕金。架空地線腕金の上部の横棒が細い。",
+        explanation: "関西電力：120度に曲がった腕金。視認性が高い関西確定の強力なヒント。架空地線腕金の上部の横棒が細いのも手掛かり。（エリア：近畿 2 府 4 県（三重県を除く）と、福井県の嶺南の西部）"
       },
       {
-        id: "guy_wire_03",
-        category: "ガイワイヤー（支線）のカバー",
-        question: "上下で太さが変わらない均一な「円筒形」の黄色い支線カバーに、黒いテープが等間隔の螺旋状に巻かれている仕様が標準の電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["東北電力"],
-        imageUrl: "./images/guy_wire_03.jpg",
-        explanation: "東北電力管内では段差のないストレートな円筒形カバーに黒いスパイラル（螺旋）が入った支線ガードが標準的で、ボトル型の西日本系と明確に区別できます。"
+        id: "top_chugoku", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？",
+        targetType: "power_company", correctAnswers: ["中国電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/chugoku.webp",
+        hint: "細い四本で支えるタイプのポールトップ（架空地線腕金）。",
+        explanation: "中国電力：細い四本で支えるタイプのポールトップ（架空地線腕金）。（エリア：鳥取県・島根県・岡山県・広島県・山口県）"
       },
       {
-        id: "guy_wire_04",
-        category: "ガイワイヤー（支線）のカバー",
-        question: "黒縞のない「黄色単色」の支線カバーが多用され、支線上部の電柱取付部に「T字型金具」や根元の三角ステイがよく見られる電力会社は？",
-        targetType: "power_company",
-        correctAnswers: ["九州電力"],
-        imageUrl: "./images/guy_wire_04.jpg",
-        explanation: "九州電力管内ではプレーンな黄色一色の支線ガードと、電柱側の特徴的なT字型ブラケット・地際ステイ金具の組み合わせが高頻度で出現します。"
+        id: "top_shikoku_1", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？",
+        targetType: "power_company", correctAnswers: ["四国電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/shikoku.webp",
+        hint: "腕金の角度が 120 度ではなく 90 度。下から見たら数字が書いてあることが多い。",
+        explanation: "四国電力：120度ではなく90度。関西のものと見比べれば一目瞭然。そして、下から見たら数字が書いてあることが多い。（エリア：四国 4 県）"
+      },
+      {
+        id: "top_shikoku_2", category: "電柱ポールトップ",
+        question: "このポールトップの金具の電力会社は？（別パターン）",
+        targetType: "power_company", correctAnswers: ["四国電力"],
+        imageUrl: "https://geopinning.space/rule/poles/top/shikoku-2.webp",
+        hint: "腕金の角度が 120 度ではなく 90 度。下から見たら数字が書いてあることが多い。",
+        explanation: "四国電力：120度ではなく90度。関西のものと見比べれば一目瞭然。そして、下から見たら数字が書いてあることが多い。（エリア：四国 4 県）"
       },
 
-      // --- 4. 標識ポールのシール・テープ ---
+      // ===== 3. ガイワイヤー（支線）のカバー（原文：ガイワイヤー（支線）のカバーの地域差） =====
       {
-        id: "sign_pole_01",
-        category: "標識ポールのシール・テープ",
-        question: "道路標識の白い支柱（ポール）の中腹〜下部に、鮮やかな「赤いリング状のテープ（赤帯1本）」が巻かれている特徴が見られる都道府県は？",
+        id: "guy_spiral", category: "ガイワイヤー（支線）のカバー",
+        question: "このタイプの支線カバー（①細い黄黒のらせん）が見られる都道府県をすべて選択してください。（該当: 15）",
         targetType: "prefecture",
-        correctAnswers: ["熊本県"],
-        imageUrl: "./images/sign_pole_01.jpg",
-        explanation: "熊本県内の道路標識ポールには、管理・視認用の「赤い1本リングテープ」が非常に高い頻度で巻かれており、九州内の県当てでトップクラスに有名なピンポイントメタです。"
+        correctAnswers: ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "新潟県", "富山県", "石川県", "福井県", "徳島県", "香川県", "愛媛県", "高知県"],
+        imageUrl: "", svgKey: "spiral",
+        hint: "細いカバーの全体に、黄色と黒の細かい斜め縞がらせん状に入る。",
+        explanation: "①細い黄黒のらせん：細いカバーの全体に、黄色と黒の細かい斜め縞がらせん状に入る。（北海道・東北・新潟・北陸・四国）※イラストは見分けやすいように簡略化したもの。四国・北陸などは他のタイプとも重複して塗られている。"
       },
       {
-        id: "sign_pole_02",
-        category: "標識ポールのシール・テープ",
-        question: "道路標識の白い支柱に、間隔を空けて「2本の黄色い横ストライプ（二重黄帯テープ）」が巻かれている管理仕様が特徴的な都道府県は？",
+        id: "guy_blocks", category: "ガイワイヤー（支線）のカバー",
+        question: "このタイプの支線カバー（②黒と黄色のブロック）が見られる都道府県をすべて選択してください。（該当: 5）",
         targetType: "prefecture",
-        correctAnswers: ["青森県"],
-        imageUrl: "./images/sign_pole_02.jpg",
-        explanation: "青森県の道路標識支柱には「黄色いテープが上下2本平行に巻かれたダブルリング」が多く見られ、岩手県・秋田県との県境判別で非常に役立ちます。"
+        correctAnswers: ["長野県", "岐阜県", "静岡県", "愛知県", "三重県"],
+        imageUrl: "", svgKey: "blocks",
+        hint: "上から黒・黄・黒・黄と大きく塗り分け。下半分の太い筒の上側が黒い。",
+        explanation: "②黒と黄色のブロック：上から黒・黄・黒・黄と大きく塗り分け。下半分の太い筒の上側が黒い。（長野・岐阜・静岡・愛知・三重）"
       },
       {
-        id: "sign_pole_03",
-        category: "標識ポールのシール・テープ",
-        question: "道路標識の支柱に「赤と黄色の交互ストライプ（ゼブラ帯）」の反射テープ・シールが巻かれていることが多い四国の都道府県は？",
+        id: "guy_yellow", category: "ガイワイヤー（支線）のカバー",
+        question: "このタイプの支線カバー（③黄色一色・下が太い）が見られる都道府県をすべて選択してください。（該当: 23）",
         targetType: "prefecture",
-        correctAnswers: ["香川県"],
-        imageUrl: "./images/sign_pole_03.jpg",
-        explanation: "香川県では標識のポールに黄色と赤の縞模様（斜めまたは縦縞リング）の反射シートが貼付されているケースが多く、四国4県の中でも特に判別しやすい特徴となっています。"
+        correctAnswers: ["茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "福井県", "山梨県", "長野県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "徳島県", "香川県", "愛媛県", "高知県"],
+        imageUrl: "", svgKey: "yellow",
+        hint: "黄色一色で、下の筒が太い。地域性がある中では典型的なパターン。",
+        explanation: "③黄色一色・下が太い：地域性がある中では典型的なパターン。（関東・山梨・長野・東海・福井・近畿・四国）※地図の塗り分けでは岐阜県は含まれていない。"
       },
       {
-        id: "sign_pole_04",
-        category: "標識ポールのシール・テープ",
-        question: "道路標識の支柱下部やガードレール支柱に「緑色の縦長管理ステッカー（緑シール）」が高頻度で貼られている東九州の2県は？（複数選択）",
+        id: "guy_bold", category: "ガイワイヤー（支線）のカバー",
+        question: "このタイプの支線カバー（④上下しましま）が見られる都道府県をすべて選択してください。（該当: 13）",
         targetType: "prefecture",
-        correctAnswers: ["大分県", "宮崎県"],
-        imageUrl: "./images/sign_pole_04.jpg",
-        explanation: "大分県および宮崎県では、標識ポール下部やガードレール支柱に特徴的な「緑色の管理ステッカー」が貼られていることが多く、東九州エリア特定の重要な手がかりになります。"
-      },
-
-      // --- 5. 横断歩道のダイヤマーク ---
-      {
-        id: "diamond_01",
-        category: "横断歩道のダイヤマーク",
-        question: "横断歩道予告の白いダイヤマーク（◇）の辺・角付近に、意図的な「4箇所のスリット（切れ込み隙間）」が入る型が多用される関東の3県は？（複数選択）",
-        targetType: "prefecture",
-        correctAnswers: ["茨城県", "栃木県", "埼玉県"],
-        imageUrl: "./images/diamond_01.jpg",
-        explanation: "北関東の茨城県・栃木県および隣接する埼玉県では、ステンシル型枠の仕様によりダイヤマークに明確な切れ込み（スリット）が入ったタイプが広く分布しています。"
+        correctAnswers: ["富山県", "石川県", "福井県", "三重県", "滋賀県", "京都府", "大阪府", "奈良県", "和歌山県", "徳島県", "香川県", "愛媛県", "高知県"],
+        imageUrl: "", svgKey: "bold",
+        hint: "下の太い筒も黄色と黒の斜め縞。",
+        explanation: "④上下しましま：下の太い筒も黄色と黒の斜め縞。（北陸・近畿・四国）※地図の塗り分けでは兵庫県は含まれず、三重県は含まれている。"
       },
       {
-        id: "diamond_02",
-        category: "横断歩道のダイヤマーク",
-        question: "横断歩道手前のダイヤマークの輪郭が実線ではなく、細かな「破線（点線状の短い白線）」で描かれるユニークな路面標示が知られる中国地方の県は？",
+        id: "guy_spindle", category: "ガイワイヤー（支線）のカバー",
+        question: "このタイプの支線カバー（⑤すこし独特な形）が見られる都道府県をすべて選択してください。（該当: 5）",
         targetType: "prefecture",
-        correctAnswers: ["岡山県"],
-        imageUrl: "./images/diamond_02.jpg",
-        explanation: "岡山県の一部県道・幹線道路等では、排水性や摩耗抑制・独自施工規格により輪郭が「破線（ドット状セグメント）」になったダイヤマークが存在し、道路メタとして有名です。"
+        correctAnswers: ["鳥取県", "島根県", "岡山県", "広島県", "山口県"],
+        imageUrl: "", svgKey: "spindle",
+        hint: "下の端がふくらむ。",
+        explanation: "⑤すこし独特な形：下の端がふくらむ。（中国地方 5 県）"
       },
       {
-        id: "diamond_03",
-        category: "横断歩道のダイヤマーク",
-        question: "除雪摩耗対策の太く角が閉じた大型ダイヤマークが、路肩上空の「赤白の矢羽根（固定式視線誘導柱）」とセットで現れる都道府県は？",
+        id: "guy_tan", category: "ガイワイヤー（支線）のカバー",
+        question: "このタイプの支線カバー（⑥上が細く下が太い）が見られる都道府県をすべて選択してください。（該当: 8）",
         targetType: "prefecture",
-        correctAnswers: ["北海道"],
-        imageUrl: "./images/diamond_03.jpg",
-        explanation: "北海道では広い車線幅に合わせて重厚にペイントされたダイヤマークと、路肩位置を積雪時に示す赤白の下向き矢印（矢羽根）の組み合わせが定番の道路景観となります。"
-      },
-      {
-        id: "diamond_04",
-        category: "横断歩道のダイヤマーク",
-        question: "融雪・雨水排水のためにダイヤの上下左右の頂点付近が大きく開いた（4辺が独立した棒状に見える）スリット型ペイントが特に目立って見られる北陸の2県は？（複数選択）",
-        targetType: "prefecture",
-        correctAnswers: ["富山県", "石川県"],
-        imageUrl: "./images/diamond_04.jpg",
-        explanation: "豪雪・多雨地域の富山県や石川県では、水はけや融雪水対策として頂点部分を繋げず4本の白線パーツとして離して施工するダイヤマークがよく観察されます。"
+        correctAnswers: ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"],
+        imageUrl: "", svgKey: "tan",
+        hint: "下部が太い。",
+        explanation: "⑥上が細く下が太い：下部が太い。（九州 7 県と沖縄県）"
       },
 
-      // --- 6. 「止まれ」の路面標示 ---
+      // ===== 4. 標識ポールのシール・テープ =====
       {
-        id: "tomare_01",
-        category: "「止まれ」の路面標示",
-        question: "路面標示「止まれ」の「れ」において、左の縦棒と右の折れ線が離れた「離れ型（関西型）」が主流となる近畿地方の5府県をすべて選べ（※くっつき型の京都府・三重県を除く）",
-        targetType: "prefecture",
-        correctAnswers: ["滋賀県", "大阪府", "兵庫県", "奈良県", "和歌山県"],
-        imageUrl: "./images/tomare_01.jpg",
-        explanation: "関西圏（大阪・兵庫・滋賀・奈良・和歌山）では「れ」の1画目縦線と2画目が分離した「離れ型」フォントが主流です。隣接する京都府だけが「くっつき型」である点が超重要メタです。"
+        id: "sign_hokkaido", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["北海道"],
+        imageUrl: "https://geopinning.space/rule/poles/hokkaido.png",
+        hint: "標識のポールに白っぽいシールが張られている。",
+        explanation: "① 北海道：標識のポールに白っぽいシールが張られている。"
       },
       {
-        id: "tomare_02",
-        category: "「止まれ」の路面標示",
-        question: "周囲を「離れ型」の関西圏に囲まれながら、唯一「れ」の縦棒と横線が一体化した角張った「くっつき型」が主流で、府県境特定に直結する近畿の府県は？",
-        targetType: "prefecture",
-        correctAnswers: ["京都府"],
-        imageUrl: "./images/tomare_02.jpg",
-        explanation: "京都府警管轄の路面標示は、大阪・兵庫・滋賀・奈良とは異なり「れ」がガッチリ繋がった角張った「くっつき型」を採用しているため、関西電力エリア内で京都府を一発特定できます。"
+        id: "sign_miyagi", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["宮城県"],
+        imageUrl: "https://geopinning.space/rule/poles/miyagi.png",
+        hint: "",
+        explanation: "② 宮城県（geopinning.space では写真のみ掲載。説明文はなし）"
       },
       {
-        id: "tomare_03",
-        category: "「止まれ」の路面標示",
-        question: "琉球石灰岩骨材による白っぽいアスファルト上に、白い四角の「外枠線（白枠囲み）」や赤舗装枠を伴う角張った「止まれ」が多用される都道府県は？",
-        targetType: "prefecture",
-        correctAnswers: ["沖縄県"],
-        imageUrl: "./images/tomare_03.jpg",
-        explanation: "沖縄県では石灰岩を含む明るい灰白色の路面に加え、「止まれ」の周囲を白い長方形の枠線で囲んだ視認強調ペイントや独特のステンシル書体が非常に多く見られます。"
+        id: "sign_yamagata", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["山形県"],
+        imageUrl: "https://geopinning.space/rule/poles/yamagata.png",
+        hint: "標識のポールに、青・黒・黄色といった細いシールがいくつか巻かれている。",
+        explanation: "③ 山形県：標識のポールに、青・黒・黄色といった細いシールがいくつか巻かれている。"
       },
       {
-        id: "tomare_04",
-        category: "「止まれ」の路面標示",
-        question: "都市部の生活道路・狭隘路において、標準サイズより一回り小さく凝縮された「首都圏小型ゴシック調『止まれ』」が高頻度で見られる南関東の2都県は？（複数選択）",
-        targetType: "prefecture",
-        correctAnswers: ["東京都", "神奈川県"],
-        imageUrl: "./images/tomare_04.jpg",
-        explanation: "東京都および神奈川県の住宅街では、道幅に合わせたコンパクトな「小型の止まれ」ペイントが多用されており、関東圏内での南関東絞り込みに有効な補助メタです。"
+        id: "sign_ibaraki", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["茨城県"],
+        imageUrl: "https://geopinning.space/rule/poles/ibaraki.png",
+        hint: "標識のポールに黄色いテープが 3 本巻かれている。",
+        explanation: "④ 茨城県：標識のポールに黄色いテープが 3 本巻かれている。覚えやすく、視認性もよい。"
+      },
+      {
+        id: "sign_tochigi", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["栃木県"],
+        imageUrl: "https://geopinning.space/rule/poles/tochigi.png",
+        hint: "標識のポールに非常に小さな点検シールが貼られている。",
+        explanation: "⑤ 栃木県：標識のポールに非常に小さな点検シールが貼られている。2014 年に規制標識にのみ貼られたものらしい。"
+      },
+      {
+        id: "sign_gunma", category: "標識ポールのシール・テープ",
+        question: "この標識のシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["群馬県"],
+        imageUrl: "https://geopinning.space/rule/poles/gunma.png",
+        hint: "標識の裏面に大きめの四角いシールが貼ってある。",
+        explanation: "⑥ 群馬県：標識の裏面に大きめの四角いシールが貼ってある。関東地方でこのシールを見かけたら、ほとんどの場合は群馬県。"
+      },
+      {
+        id: "sign_saitama", category: "標識ポールのシール・テープ",
+        question: "この標識のシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["埼玉県"],
+        imageUrl: "https://geopinning.space/rule/poles/saitama.png",
+        hint: "標識の裏面に細長い縞々のシールが貼ってある。",
+        explanation: "⑦ 埼玉県：標識の裏面に細長い縞々のシールが貼ってある。"
+      },
+      {
+        id: "sign_tokyo", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["東京都"],
+        imageUrl: "https://geopinning.space/rule/poles/tokyo.png",
+        hint: "標識のポールに管理番号が張られたシールが貼られている。また、いくつか色のついた丸いシールが張られていることが多い。",
+        explanation: "⑧ 東京都：標識のポールに管理番号が張られたシールが貼られている。また、いくつか色のついた丸いシールが張られていることが多い。"
+      },
+      {
+        id: "sign_gifu", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["岐阜県"],
+        imageUrl: "https://geopinning.space/rule/poles/gifu.png",
+        hint: "標識のポールに黄色いテープと花が描かれたシールが貼ってある。",
+        explanation: "⑨ 岐阜県：標識のポールに黄色いテープと花が描かれたシールが貼ってある。"
+      },
+      {
+        id: "sign_shizuoka", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["静岡県"],
+        imageUrl: "https://geopinning.space/rule/poles/shizuoka.png",
+        hint: "標識のポールに黄色い点検シールがたくさん貼られている。",
+        explanation: "⑩ 静岡県：標識のポールに黄色い点検シールがたくさん貼られている。"
+      },
+      {
+        id: "sign_osaka", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["大阪府"],
+        imageUrl: "https://geopinning.space/rule/poles/osaka.png",
+        hint: "",
+        explanation: "⑪ 大阪府：標識のポールに貼られているシールから県を特定できる。"
+      },
+      {
+        id: "sign_nara", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["奈良県"],
+        imageUrl: "https://geopinning.space/rule/poles/nara.png",
+        hint: "",
+        explanation: "⑫ 奈良県（geopinning.space では写真のみ掲載。説明文はなし）"
+      },
+      {
+        id: "sign_tottori", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["鳥取県"],
+        imageUrl: "https://geopinning.space/rule/poles/tottori.png",
+        hint: "標識のポールに黄色いシールが貼られている。",
+        explanation: "⑬ 鳥取県：標識のポールに黄色いシールが貼られている。「鳥取県」と書かれたシールが貼られていることもある。"
+      },
+      {
+        id: "sign_shimane", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["島根県"],
+        imageUrl: "https://geopinning.space/rule/poles/shimane.png",
+        hint: "標識のポールに細いシールが巻かれている。シールの色はいろいろある。",
+        explanation: "⑭ 島根県：標識のポールに細いシールが巻かれている。シールの色はいろいろある。"
+      },
+      {
+        id: "sign_okayama", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["岡山県"],
+        imageUrl: "https://geopinning.space/rule/poles/okayama.png",
+        hint: "標識のポールに、標識管理番号が記載された黄色いシールが貼られている。",
+        explanation: "⑮ 岡山県：標識のポールに、標識管理番号が記載された黄色いシールが貼られている。"
+      },
+      {
+        id: "sign_yamaguchi", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["山口県"],
+        imageUrl: "https://geopinning.space/rule/poles/yamaguchi.png",
+        hint: "標識のポールに黄色と青のシールが貼られている。",
+        explanation: "⑯ 山口県：標識のポールに黄色と青のシールが貼られている。"
+      },
+      {
+        id: "sign_tokushima", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシールが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["徳島県"],
+        imageUrl: "https://geopinning.space/rule/poles/tokushima.png",
+        hint: "標識のポールに幅が広く長い黄色のシールが貼られている。色がはがれて白っぽくなっている場合もある。",
+        explanation: "⑰ 徳島県：標識のポールに幅が広く長い黄色のシールが貼られている。色がはがれて白っぽくなっている場合もある。"
+      },
+      {
+        id: "sign_kagawa_ehime_kochi", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県をすべて選択してください。（該当: 3）",
+        targetType: "prefecture", correctAnswers: ["香川県", "愛媛県", "高知県"],
+        imageUrl: "https://geopinning.space/rule/poles/kochi_ehime.png",
+        hint: "",
+        explanation: "⑱ 香川県・愛媛県・高知県（geopinning.space では写真のみ掲載。説明文はなし）"
+      },
+      {
+        id: "sign_saga_nagasaki", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["佐賀県", "長崎県"],
+        imageUrl: "https://geopinning.space/rule/poles/nagasaki_saga.png",
+        hint: "",
+        explanation: "⑲ 佐賀県・長崎県（geopinning.space では写真のみ掲載。説明文はなし）"
+      },
+      {
+        id: "sign_kumamoto", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのテープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["熊本県"],
+        imageUrl: "https://geopinning.space/rule/poles/kumamoto.png",
+        hint: "標識や看板の支柱に赤いテープが巻いてある。",
+        explanation: "⑳ 熊本県：標識や看板の支柱に赤いテープが巻いてある。"
+      },
+      {
+        id: "sign_oita", category: "標識ポールのシール・テープ",
+        question: "この標識ポールのシール・テープが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["大分県"],
+        imageUrl: "https://geopinning.space/rule/poles/oita.png",
+        hint: "",
+        explanation: "㉑ 大分県（geopinning.space では写真のみ掲載。説明文はなし）"
       },
 
-      // --- 7. 擁壁のブロック模様 ---
+      // ===== 5. 横断歩道のダイヤマーク =====
       {
-        id: "wall_01",
-        category: "擁壁のブロック模様",
-        question: "花崗岩（真砂土）地帯の斜面保護として、明るい灰白色の「正六角形（亀甲型・ハニカム状）」コンクリートブロック擁壁が特に多用される山陽西部の2県は？（複数選択）",
+        id: "dia_common", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマーク（①最も一般的なタイプ）が見られる県として geopinning.space に掲載されている都道府県をすべて選択してください。（該当: 16）",
         targetType: "prefecture",
-        correctAnswers: ["広島県", "山口県"],
-        imageUrl: "./images/wall_01.jpg",
-        explanation: "真砂土（風化花崗岩）による土砂災害対策が進む広島県〜山口県エリアでは、白っぽい色調の六角形（亀甲積み）装飾擁壁や独特の法面ブロックが住宅団地・山沿いで頻出します。"
+        correctAnswers: ["北海道", "青森県", "秋田県", "岩手県", "山形県", "福島県", "東京都", "神奈川県", "福井県", "愛知県", "大阪府", "愛媛県", "福岡県", "長崎県", "宮崎県", "鹿児島県"],
+        imageUrl: "https://geopinning.space/rule/asia/japan/diamond-marking-b.svg",
+        hint: "",
+        explanation: "①最も一般的なタイプ：北海道・青森県・秋田県・岩手県・山形県・福島県・東京都・神奈川県・福井県・愛知県・大阪府・愛媛県・福岡県・長崎県・宮崎県・鹿児島県。※①の最も一般的な形はほかの県でも見られる。1 つの県で複数の形が見られることもある。"
       },
       {
-        id: "wall_02",
-        category: "擁壁のブロック模様",
-        question: "急峻な斜面都市が多く、黒っぽい火山岩系の石積みと、表面に「十字・四つ目突起模様」が入った間知ブロック擁壁が坂道沿いに密集する九州西端の県は？",
-        targetType: "prefecture",
-        correctAnswers: ["長崎県"],
-        imageUrl: "./images/wall_02.jpg",
-        explanation: "平地が少なく斜面住宅地が多い長崎県では、安山岩・玄武岩の黒みがかった石垣と、四つ目・十字レリーフ模様の間知ブロック擁壁が幾重にも重なる独特の景観を作ります。"
+        id: "dia_n", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["新潟県", "茨城県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-n-dark.svg",
+        hint: "",
+        explanation: "② 新潟県・茨城県。※1 つの県で複数の形が見られることもある（新潟県・茨城県は④の形でも掲載）。"
       },
       {
-        id: "wall_03",
-        category: "擁壁のブロック模様",
-        question: "河川の丸石を埋め込んだ「玉石（丸石）コンクリート擁壁」がみかん畑・茶畑や山間道路の法面に特に象徴的に見られる東海道隣接の2県は？（複数選択）",
-        targetType: "prefecture",
-        correctAnswers: ["神奈川県", "静岡県"],
-        imageUrl: "./images/wall_03.jpg",
-        explanation: "酒匂川・富士川・安倍川・大井川などの急流河川が多い神奈川県西部〜静岡県にかけては、丸い川石（玉石）を使った伝統的な玉石積み擁壁が農地斜面や旧道沿いに数多く残っています。"
+        id: "dia_d", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 3）",
+        targetType: "prefecture", correctAnswers: ["岐阜県", "千葉県", "群馬県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-d-dark.svg",
+        hint: "",
+        explanation: "③ 岐阜県・千葉県・群馬県。"
+      },
+      {
+        id: "dia_f", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 6）",
+        targetType: "prefecture", correctAnswers: ["新潟県", "茨城県", "埼玉県", "栃木県", "滋賀県", "沖縄県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-f-dark.svg",
+        hint: "",
+        explanation: "④ 新潟県・茨城県・埼玉県・栃木県・滋賀県・沖縄県。"
+      },
+      {
+        id: "dia_l", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["長野県", "山梨県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-l-dark.svg",
+        hint: "",
+        explanation: "⑤ 長野県・山梨県。（長野県は⑫の形でも掲載）"
+      },
+      {
+        id: "dia_p", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["静岡県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-p-dark.svg",
+        hint: "",
+        explanation: "⑥ 静岡県。"
+      },
+      {
+        id: "dia_b", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 4）",
+        targetType: "prefecture", correctAnswers: ["岡山県", "兵庫県", "京都府", "宮城県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-b-dark.svg",
+        hint: "",
+        explanation: "⑦ 岡山県・兵庫県・京都府・宮城県。"
+      },
+      {
+        id: "dia_m", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["奈良県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-m-dark.svg",
+        hint: "",
+        explanation: "⑧ 奈良県。（奈良県は⑨の形でも掲載）"
+      },
+      {
+        id: "dia_e", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["奈良県", "和歌山県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-e-dark.svg",
+        hint: "",
+        explanation: "⑨ 奈良県・和歌山県。"
+      },
+      {
+        id: "dia_g", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["富山県", "大分県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-g-dark.svg",
+        hint: "",
+        explanation: "⑩ 富山県・大分県。"
+      },
+      {
+        id: "dia_k", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["石川県", "熊本県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-k-dark.svg",
+        hint: "",
+        explanation: "⑪ 石川県・熊本県。"
+      },
+      {
+        id: "dia_q", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 4）",
+        targetType: "prefecture", correctAnswers: ["愛知県", "長野県", "山口県", "鹿児島県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-q-dark.svg",
+        hint: "",
+        explanation: "⑫ 愛知県・長野県・山口県・鹿児島県。"
+      },
+      {
+        id: "dia_c", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["三重県", "高知県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-c-dark.svg",
+        hint: "",
+        explanation: "⑬ 三重県・高知県。"
+      },
+      {
+        id: "dia_h", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 3）",
+        targetType: "prefecture", correctAnswers: ["島根県", "鳥取県", "佐賀県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-h-dark.svg",
+        hint: "",
+        explanation: "⑭ 島根県・鳥取県・佐賀県。（佐賀県は⑰の形でも掲載）"
+      },
+      {
+        id: "dia_j", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["広島県", "徳島県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-j-dark.svg",
+        hint: "",
+        explanation: "⑮ 広島県・徳島県。"
+      },
+      {
+        id: "dia_i", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["香川県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-i-dark.svg",
+        hint: "",
+        explanation: "⑯ 香川県。"
+      },
+      {
+        id: "dia_o", category: "横断歩道のダイヤマーク",
+        question: "この形状のダイヤマークが見られる都道府県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["佐賀県"],
+        imageUrl: "https://geopinning.space/rule/symbols/crosswalk-diamond-o-dark.svg",
+        hint: "",
+        explanation: "⑰ 佐賀県。"
+      },
+
+      // ===== 6. 「止まれ」の路面標示 =====
+      {
+        id: "stop_gifu", category: "「止まれ」の路面標示",
+        question: "この独自デザインの「止まれ」路面標示が見られる県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["岐阜県"],
+        imageUrl: "https://geopinning.space/rule/stop/gifu.jpg", hint: "",
+        explanation: "① 岐阜県。一部の県では「止まれ」の路面標示が独自のデザイン（書体・配置）になっていて、その県だけで見られる。"
+      },
+      {
+        id: "stop_aichi", category: "「止まれ」の路面標示",
+        question: "この独自デザインの「止まれ」路面標示が見られる県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["愛知県"],
+        imageUrl: "https://geopinning.space/rule/stop/aichi.jpg", hint: "",
+        explanation: "② 愛知県。一部の県では「止まれ」の路面標示が独自のデザイン（書体・配置）になっていて、その県だけで見られる。"
+      },
+      {
+        id: "stop_shiga", category: "「止まれ」の路面標示",
+        question: "この独自デザインの「止まれ」路面標示が見られる県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["滋賀県"],
+        imageUrl: "https://geopinning.space/rule/stop/shiga.jpg", hint: "",
+        explanation: "③ 滋賀県。一部の県では「止まれ」の路面標示が独自のデザイン（書体・配置）になっていて、その県だけで見られる。"
+      },
+      {
+        id: "stop_nagasaki", category: "「止まれ」の路面標示",
+        question: "この独自デザインの「止まれ」路面標示が見られる県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["長崎県"],
+        imageUrl: "https://geopinning.space/rule/stop/nagasaki.jpg", hint: "",
+        explanation: "④ 長崎県。一部の県では「止まれ」の路面標示が独自のデザイン（書体・配置）になっていて、その県だけで見られる。"
+      },
+      {
+        id: "stop_kumamoto", category: "「止まれ」の路面標示",
+        question: "この独自デザインの「止まれ」路面標示が見られる県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["熊本県"],
+        imageUrl: "https://geopinning.space/rule/stop/kumamoto.jpg", hint: "",
+        explanation: "⑤ 熊本県。一部の県では「止まれ」の路面標示が独自のデザイン（書体・配置）になっていて、その県だけで見られる。"
+      },
+      {
+        id: "stop_oita", category: "「止まれ」の路面標示",
+        question: "この独自デザインの「止まれ」路面標示が見られる県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["大分県"],
+        imageUrl: "https://geopinning.space/rule/stop/oita.jpg", hint: "",
+        explanation: "⑥ 大分県。一部の県では「止まれ」の路面標示が独自のデザイン（書体・配置）になっていて、その県だけで見られる。"
+      },
+      {
+        id: "stop_miyazaki", category: "「止まれ」の路面標示",
+        question: "この独自デザインの「止まれ」路面標示が見られる県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["宮崎県"],
+        imageUrl: "https://geopinning.space/rule/stop/miyazaki.jpg", hint: "",
+        explanation: "⑦ 宮崎県。一部の県では「止まれ」の路面標示が独自のデザイン（書体・配置）になっていて、その県だけで見られる。"
+      },
+      {
+        id: "stop_kagoshima", category: "「止まれ」の路面標示",
+        question: "この独自デザインの「止まれ」路面標示が見られる県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["鹿児島県"],
+        imageUrl: "https://geopinning.space/rule/stop/kagoshima.jpg", hint: "",
+        explanation: "⑧ 鹿児島県。一部の県では「止まれ」の路面標示が独自のデザイン（書体・配置）になっていて、その県だけで見られる。"
+      },
+
+      // ===== 7. 擁壁のブロック模様 =====
+      {
+        id: "wall_ishikawa", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["石川県"],
+        imageUrl: "https://geopinning.space/rule/walls/ishikawa.webp",
+        hint: "「＝」ブロック。",
+        explanation: "① 石川県：「＝」ブロック。※同じような模様はほかの地域にもあるので、電柱などで地方を絞ってから使う。"
+      },
+      {
+        id: "wall_oct", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["福井県", "石川県"],
+        imageUrl: "https://geopinning.space/rule/walls/wall-oct.svg",
+        hint: "中のくぼみの角がない。",
+        explanation: "② 福井県・石川県：中のくぼみの角がない。※図は実例をもとに描いた簡略図。"
+      },
+      {
+        id: "wall_iki", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 6）",
+        targetType: "prefecture", correctAnswers: ["宮城県", "長崎県", "秋田県", "石川県", "福井県", "宮崎県"],
+        imageUrl: "https://geopinning.space/rule/walls/wall-iki.svg",
+        hint: "真ん中のくぼみが小さい間知ブロック。",
+        explanation: "③ 宮城県・長崎県など：真ん中のくぼみが小さい間知ブロック。（塗られている県：宮城県・長崎県・秋田県・石川県・福井県・宮崎県）"
+      },
+      {
+        id: "wall_hishi", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["京都府", "滋賀県"],
+        imageUrl: "https://geopinning.space/rule/walls/wall-hishi.svg",
+        hint: "縦に長いひし形のブロック。",
+        explanation: "④ 京都府・滋賀県：縦に長いひし形のブロック。"
+      },
+      {
+        id: "wall_thick", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["奈良県", "三重県"],
+        imageUrl: "https://geopinning.space/rule/walls/wall-thick.svg",
+        hint: "ひし形で縁が太い。",
+        explanation: "⑤ 奈良県・三重県：ひし形で縁が太い。"
+      },
+      {
+        id: "wall_press", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 3）",
+        targetType: "prefecture", correctAnswers: ["京都府", "奈良県", "大阪府"],
+        imageUrl: "https://geopinning.space/rule/walls/wall-press.svg",
+        hint: "つぶれた六角形のブロック。",
+        explanation: "⑥ 京都府・奈良県・大阪府：つぶれた六角形のブロック。"
+      },
+      {
+        id: "wall_hex", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 3）",
+        targetType: "prefecture", correctAnswers: ["佐賀県", "宮崎県", "栃木県"],
+        imageUrl: "https://geopinning.space/rule/walls/wall-hex.svg",
+        hint: "正六角形のブロック。",
+        explanation: "⑦ 佐賀県・宮崎県：正六角形のブロック。宮崎県では県の協会型として標準化している。関東にもわずかにある。（地図で塗られている県：佐賀県・宮崎県・栃木県）"
+      },
+      {
+        id: "wall_shikoku", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["香川県", "愛媛県"],
+        imageUrl: "https://geopinning.space/rule/walls/photo-shikoku.webp",
+        hint: "外がほぼ△で、内側が小さな五角形。",
+        explanation: "⑧ 外がほぼ△で、内側が小さな五角形。場所は例外あり。（地図で塗られている県：香川県・愛媛県。項目名は「香川県・愛媛県・山口県」）"
+      },
+      {
+        id: "wall_crown", category: "擁壁のブロック模様",
+        question: "この擁壁のブロック模様が見られる都道府県（geopinning.space の地図で塗られている県）をすべて選択してください。（該当: 2）",
+        targetType: "prefecture", correctAnswers: ["長崎県", "福岡県"],
+        imageUrl: "https://geopinning.space/rule/walls/wall-crown.svg",
+        hint: "四角い溝のブロックを斜めに積んだ壁で、縦の継ぎ目や端のブロックの間に🔖のパーツがはさまる。",
+        explanation: "⑨ 長崎県・福岡県・対馬：四角い溝のブロックを斜めに積んだ壁で、縦の継ぎ目や端のブロックの間に🔖のパーツがはさまる。（地図で塗られている県：長崎県・福岡県）"
+      },
+      {
+        id: "wall_tip_wakayama", category: "擁壁のブロック模様",
+        question: "関西電力の地域で、壁の端のブロックが「外3中3」、水抜きパイプが中央にある擁壁。geopinning.space の見分け方で示されている県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["和歌山県"],
+        imageUrl: "",
+        hint: "関西電力の地域 ／ 端のブロック：外3中3（外も溝も三角）／ 水抜きパイプ：中央",
+        explanation: "関西電力の地域で外3中3＋パイプ中央なら和歌山。端のブロックは「外」（外形）と「中」（溝）の角の数で呼ぶ（外3中3＝外も溝も三角）。※壁の端が草や苔、コンクリートで隠れているときは無理に決めない。"
+      },
+      {
+        id: "wall_tip_hyogo", category: "擁壁のブロック模様",
+        question: "関西電力の地域で、壁の端のブロックが「外5中5」または「外5中3」、水抜きパイプが中央にある擁壁。geopinning.space の見分け方で示されている県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["兵庫県"],
+        imageUrl: "",
+        hint: "関西電力の地域 ／ 端のブロック：外5中5・外5中3 ／ 水抜きパイプ：中央",
+        explanation: "関西電力の地域で外5中5・外5中3＋パイプ中央なら兵庫。外5中3＝外が五角・溝が三角、外5中5＝外も溝も五角。※同じ模様がほかの県に少しある型も多い。"
+      },
+      {
+        id: "wall_tip_okayama", category: "擁壁のブロック模様",
+        question: "中国地方で、壁の端のブロックが「外5中3」、水抜きパイプが中央にある擁壁。geopinning.space の見分け方で示されている県は？（該当: 1）",
+        targetType: "prefecture", correctAnswers: ["岡山県"],
+        imageUrl: "",
+        hint: "中国地方 ／ 端のブロック：外5中3（外が五角・溝が三角）／ 水抜きパイプ：中央",
+        explanation: "中国地方で外5中3＋パイプ中央なら岡山。外5中3＝外が五角・溝が三角。※壁の端が草や苔、コンクリートで隠れているときは無理に決めない。"
       }
     ];
 
     /* =========================================================================
-     * 3. 視覚メタ再現ベクター（SVG）イラスト描画エンジン（オフライン完全対応）
+     * 3. フォールバック描画（オフライン・画像読込失敗時）
+     *    - ガイワイヤー：geopinning.space の図と同じ形状の簡略図を内蔵SVGで描画
+     *    - その他：原文の見た目の記述（hint）を表示する出題カード（独自の図は描かない）
      * ========================================================================= */
+    const GUYWIRE_SHAPES = {
+      spiral: `
+        <defs><pattern id="gwSpiralS" width="9.12" height="9.12" patternUnits="userSpaceOnUse" patternTransform="rotate(-45 15 113)"><rect width="9.12" height="9.12" fill="#F2C200"/><rect width="9.12" height="3.82" fill="#1F2328"/></pattern></defs>
+        <rect x="12" y="25" width="6" height="88" fill="url(#gwSpiralS)" stroke="#6B7280" stroke-width="0.6"/>`,
+      blocks: `
+        <rect x="12" y="48" width="6" height="22" fill="#F2C200" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="12" y="26" width="6" height="22" fill="#1F2328" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="9.6" y="88" width="10.8" height="25" fill="#F2C200" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="9.6" y="70" width="10.8" height="18" fill="#1F2328" stroke="#6B7280" stroke-width="0.6"/>`,
+      yellow: `
+        <rect x="12" y="29" width="6" height="59.64" fill="#F2C200" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="11.64" y="88.64" width="6.72" height="24.36" fill="#F2C200" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="11.64" y="87.04" width="6.72" height="1.2" fill="#1F2328"/>
+        <rect x="11.64" y="90.44" width="6.72" height="1.2" fill="#1F2328"/>
+        <rect x="11.64" y="105.68" width="6.72" height="1.2" fill="#1F2328"/>
+        <rect x="12.6" y="26.8" width="4.8" height="2.2" fill="#1F2328" stroke="#6B7280" stroke-width="0.6"/>`,
+      bold: `
+        <defs>
+          <pattern id="gwBoldS" width="9.12" height="9.12" patternUnits="userSpaceOnUse" patternTransform="rotate(-45 15 113)"><rect width="9.12" height="9.12" fill="#F2C200"/><rect width="9.12" height="3.82" fill="#1F2328"/></pattern>
+          <pattern id="gwBoldB" width="12.1" height="12.1" patternUnits="userSpaceOnUse" patternTransform="rotate(-45 15 113)"><rect width="12.1" height="12.1" fill="#F2C200"/><rect width="12.1" height="6.05" fill="#1F2328"/></pattern>
+        </defs>
+        <rect x="12" y="30" width="6" height="40" fill="url(#gwBoldS)" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="9" y="70" width="12" height="43" fill="url(#gwBoldB)" stroke="#6B7280" stroke-width="0.6"/>`,
+      spindle: `
+        <rect x="12.3" y="19" width="5.4" height="66" fill="#E8892B" stroke="#6B7280" stroke-width="0.6"/>
+        <path d="M12.3 83 C 7.5 89, 7.5 103, 15 113 C 22.5 103, 22.5 89, 17.7 83 Z" fill="#E8892B" stroke="#6B7280" stroke-width="0.6"/>`,
+      tan: `
+        <rect x="12" y="29" width="6" height="44" fill="#D2A24C" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="8.1" y="73" width="13.8" height="40" fill="#D2A24C" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="9.34" y="70.4" width="11.32" height="3" fill="#1F2328" stroke="#6B7280" stroke-width="0.6"/>
+        <rect x="12.6" y="27.2" width="4.8" height="1.8" fill="#1F2328" stroke="#6B7280" stroke-width="0.6"/>`
+    };
+
+    function wrapTextLines(text, maxChars) {
+      const lines = [];
+      let buf = "";
+      for (const ch of String(text)) {
+        buf += ch;
+        if (buf.length >= maxChars) {
+          lines.push(buf);
+          buf = "";
+        }
+      }
+      if (buf) lines.push(buf);
+      return lines;
+    }
+
     function renderMetaSVG(q) {
-      const id = q.id;
       const w = 800;
       const h = 420;
-
-      // 共通背景グラデーション定義
-      const commonDefs = `
-        <defs>
-          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.45"/>
-            <stop offset="65%" stop-color="#38bdf8" stop-opacity="0.18"/>
-            <stop offset="100%" stop-color="#1e293b" stop-opacity="0.9"/>
-          </linearGradient>
-          <linearGradient id="poleConcrete" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="#64748b"/>
-            <stop offset="38%" stop-color="#cbd5e1"/>
-            <stop offset="72%" stop-color="#94a3b8"/>
-            <stop offset="100%" stop-color="#475569"/>
-          </linearGradient>
-          <linearGradient id="asphaltGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#1e293b"/>
-            <stop offset="100%" stop-color="#334155"/>
-          </linearGradient>
-          <pattern id="diagReflect" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
-            <rect width="12" height="24" fill="#facc15"/>
-            <rect x="12" width="12" height="24" fill="#111827"/>
-          </pattern>
-          <pattern id="vertStripe" width="14" height="24" patternUnits="userSpaceOnUse">
-            <rect width="7" height="24" fill="#facc15"/>
-            <rect x="7" width="7" height="24" fill="#111827"/>
-          </pattern>
-          <pattern id="horizStripe" width="24" height="18" patternUnits="userSpaceOnUse">
-            <rect width="24" height="9" fill="#facc15"/>
-            <rect y="9" width="24" height="9" fill="#111827"/>
-          </pattern>
-        </defs>
-      `;
-
       let scene = "";
 
-      // --- カテゴリ1: 電柱の表示帯 ---
-      if (id.startsWith("pole_band_")) {
-        let plateSvg = "";
-        if (id === "pole_band_01") {
-          // 中部電力：縦長楕円形プレート
-          plateSvg = `
-            <ellipse cx="400" cy="185" rx="34" ry="74" fill="#f8fafc" stroke="#15803d" stroke-width="3"/>
-            <circle cx="400" cy="132" r="5" fill="#94a3b8"/>
-            <circle cx="400" cy="238" r="5" fill="#94a3b8"/>
-            <text x="400" y="164" text-anchor="middle" fill="#15803d" font-size="16" font-weight="800" font-family="sans-serif">サクラ</text>
-            <line x1="374" y1="174" x2="426" y2="174" stroke="#15803d" stroke-width="2"/>
-            <text x="400" y="200" text-anchor="middle" fill="#0f172a" font-size="22" font-weight="900" font-family="monospace">34</text>
-            <text x="400" y="224" text-anchor="middle" fill="#0f172a" font-size="20" font-weight="900" font-family="monospace">128</text>
-            <g transform="translate(510, 120)">
-              <rect width="220" height="110" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
-              <text x="110" y="28" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">拡大ディテール（着眼点）</text>
-              <ellipse cx="110" cy="68" rx="22" ry="34" fill="#f8fafc" stroke="#15803d" stroke-width="2.5"/>
-              <text x="110" y="73" text-anchor="middle" fill="#0f172a" font-size="12" font-weight="800">楕円形</text>
-            </g>
-          `;
-        } else if (id === "pole_band_02") {
-          // 関西電力：黒地に縦書きカタカナ＋外枠なし斜め黒黄反射帯
-          plateSvg = `
-            <rect x="382" y="88" width="36" height="122" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
-            <text x="400" y="114" text-anchor="middle" fill="#facc15" font-size="16" font-weight="800">ホ</text>
-            <text x="400" y="134" text-anchor="middle" fill="#facc15" font-size="16" font-weight="800">ン</text>
-            <text x="400" y="154" text-anchor="middle" fill="#facc15" font-size="16" font-weight="800">マ</text>
-            <text x="400" y="174" text-anchor="middle" fill="#facc15" font-size="16" font-weight="800">チ</text>
-            <text x="400" y="198" text-anchor="middle" fill="#f8fafc" font-size="15" font-weight="800">二四</text>
-            <rect x="352" y="242" width="96" height="120" fill="url(#diagReflect)"/>
-          `;
-        } else if (id === "pole_band_03") {
-          // 北海道電力：上部小数字（横）＋下部大数字（縦）
-          plateSvg = `
-            <rect x="376" y="100" width="48" height="156" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
-            <rect x="376" y="100" width="48" height="28" fill="#e2e8f0"/>
-            <text x="400" y="119" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="900" font-family="monospace">14-32</text>
-            <line x1="376" y1="128" x2="424" y2="128" stroke="#64748b" stroke-width="1.5"/>
-            <text x="400" y="162" text-anchor="middle" fill="#0f172a" font-size="28" font-weight="900" font-family="monospace">5</text>
-            <text x="400" y="198" text-anchor="middle" fill="#0f172a" font-size="28" font-weight="900" font-family="monospace">2</text>
-            <text x="400" y="234" text-anchor="middle" fill="#0f172a" font-size="28" font-weight="900" font-family="monospace">8</text>
-          `;
-        } else if (id === "pole_band_04") {
-          // 北陸電力：横向き水平ストライプ反射帯
-          plateSvg = `
-            <rect x="380" y="95" width="40" height="96" rx="2" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
-            <text x="400" y="125" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="800">24-A</text>
-            <text x="400" y="155" text-anchor="middle" fill="#0f172a" font-size="16" font-weight="900">106</text>
-            <rect x="352" y="220" width="96" height="145" fill="url(#horizStripe)" stroke="#facc15" stroke-width="2"/>
-            <g transform="translate(505, 225)">
-              <rect width="230" height="90" rx="10" fill="#0f172a" stroke="#facc15" stroke-width="1.5"/>
-              <text x="115" y="34" text-anchor="middle" fill="#facc15" font-size="14" font-weight="800">水平（横縞）リフレクター</text>
-              <text x="115" y="60" text-anchor="middle" fill="#cbd5e1" font-size="12">斜めではなく真横に黒黄ライン</text>
-            </g>
-          `;
-        } else if (id === "pole_band_05") {
-          // 中国電力：赤黄アクセント＋右寄せ横書きカタカナ
-          plateSvg = `
-            <rect x="366" y="110" width="68" height="106" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
-            <path d="M366 122 Q400 112 434 122 L434 130 Q400 120 366 130 Z" fill="#ef4444"/>
-            <path d="M366 130 Q400 120 434 130 L434 136 Q400 126 366 136 Z" fill="#facc15"/>
-            <text x="428" y="160" text-anchor="end" fill="#0f172a" font-size="13" font-weight="800">ナカマチ</text>
-            <text x="428" y="182" text-anchor="end" fill="#0f172a" font-size="15" font-weight="900" font-family="monospace">支 14-2</text>
-            <rect x="358" y="245" width="84" height="120" fill="url(#vertStripe)" stroke="#facc15" stroke-width="2"/>
-          `;
-        } else {
-          // 四国電力：四つ葉幾何学モチーフ＋緑/青系コード
-          plateSvg = `
-            <rect x="372" y="106" width="56" height="122" rx="3" fill="#f8fafc" stroke="#0284c7" stroke-width="1.8"/>
-            <g transform="translate(400, 128)">
-              <circle cx="-5" cy="-5" r="4.5" fill="#16a34a"/>
-              <circle cx="5" cy="-5" r="4.5" fill="#0284c7"/>
-              <circle cx="-5" cy="5" r="4.5" fill="#0284c7"/>
-              <circle cx="5" cy="5" r="4.5" fill="#f59e0b"/>
-            </g>
-            <text x="400" y="162" text-anchor="middle" fill="#0369a1" font-size="13" font-weight="800">サヌキ</text>
-            <text x="400" y="188" text-anchor="middle" fill="#15803d" font-size="16" font-weight="900" font-family="monospace">18-4</text>
-            <rect x="354" y="252" width="92" height="112" fill="url(#diagReflect)" stroke="#ef4444" stroke-width="2"/>
-          `;
-        }
-
-        scene = `
-          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
-          <path d="M0 330 Q200 290 420 325 T800 310 L800 420 L0 420 Z" fill="#0f172a" opacity="0.75"/>
-          <rect x="352" y="15" width="96" height="405" fill="url(#poleConcrete)"/>
-          <rect x="349" y="65" width="102" height="8" rx="2" fill="#475569"/>
-          ${plateSvg}
-        `;
-      }
-
-      // --- カテゴリ2: 電柱ポールトップ ---
-      else if (id.startsWith("pole_top_")) {
-        let capSvg = "";
-        if (id === "pole_top_01") {
-          // 東北電力：円錐形コーンキャップ
-          capSvg = `
-            <polygon points="400,48 366,142 434,142" fill="#cbd5e1" stroke="#475569" stroke-width="3"/>
-            <line x1="400" y1="48" x2="400" y2="142" stroke="#64748b" stroke-width="2"/>
-            <circle cx="400" cy="44" r="6" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-            <line x1="60" y1="44" x2="740" y2="44" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,3"/>
-          `;
-        } else if (id === "pole_top_02") {
-          // 東京電力：二股U字・「並」型フレーム
-          capSvg = `
-            <path d="M368 155 L368 74 L432 74 L432 155" fill="none" stroke="#cbd5e1" stroke-width="7" stroke-linejoin="round"/>
-            <line x1="358" y1="74" x2="442" y2="74" stroke="#e2e8f0" stroke-width="7"/>
-            <line x1="400" y1="74" x2="400" y2="48" stroke="#cbd5e1" stroke-width="6"/>
-            <circle cx="400" cy="45" r="6" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-            <line x1="60" y1="45" x2="740" y2="45" stroke="#94a3b8" stroke-width="2"/>
-          `;
-        } else if (id === "pole_top_03") {
-          // 中部電力：細長い鋭角A字型
-          capSvg = `
-            <path d="M374 155 L400 42 L426 155" fill="none" stroke="#e2e8f0" stroke-width="6.5" stroke-linejoin="round"/>
-            <line x1="383" y1="112" x2="417" y2="112" stroke="#cbd5e1" stroke-width="5"/>
-            <circle cx="400" cy="40" r="6" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-            <line x1="60" y1="40" x2="740" y2="40" stroke="#94a3b8" stroke-width="2"/>
-          `;
-        } else if (id === "pole_top_04") {
-          // 北陸電力：丸穴が縦に2つ空いた台形キャップ
-          capSvg = `
-            <polygon points="384,56 416,56 430,145 370,145" fill="#cbd5e1" stroke="#475569" stroke-width="3"/>
-            <circle cx="400" cy="84" r="10" fill="#0f172a" stroke="#475569" stroke-width="2.5"/>
-            <circle cx="400" cy="118" r="12" fill="#0f172a" stroke="#475569" stroke-width="2.5"/>
-            <circle cx="400" cy="48" r="6" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-            <line x1="60" y1="48" x2="740" y2="48" stroke="#94a3b8" stroke-width="2"/>
-          `;
-        } else if (id === "pole_top_05") {
-          // 関西電力：120度くの字に折れ曲がった1本腕
-          capSvg = `
-            <path d="M400 150 L400 108 L478 52" fill="none" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="480" cy="50" r="6.5" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-            <line x1="60" y1="50" x2="740" y2="50" stroke="#94a3b8" stroke-width="2"/>
-            <text x="530" y="96" fill="#38bdf8" font-size="14" font-weight="700">約120°の鈍角アーム</text>
-          `;
-        } else {
-          // 沖縄電力：架空地線ツノなし＋太柱天端直近の十字/短腕金＋耐塩皿がいし
-          capSvg = `
-            <rect x="364" y="136" width="72" height="12" rx="4" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>
-            <text x="400" y="95" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="700">頂部ツノなし（フラット天端）</text>
-            <ellipse cx="290" cy="196" rx="14" ry="7" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
-            <ellipse cx="290" cy="205" rx="14" ry="7" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
-            <ellipse cx="510" cy="196" rx="14" ry="7" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
-            <ellipse cx="510" cy="205" rx="14" ry="7" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
-          `;
-        }
-
-        scene = `
-          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
-          <!-- 電柱本体 -->
-          <polygon points="368,142 432,142 444,420 356,420" fill="url(#poleConcrete)"/>
-          <!-- 高圧腕金とがいし -->
-          <rect x="230" y="212" width="340" height="12" rx="2" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
-          <rect x="256" y="192" width="14" height="20" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
-          <rect x="393" y="192" width="14" height="20" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
-          <rect x="530" y="192" width="14" height="20" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
-          <line x1="40" y1="192" x2="760" y2="192" stroke="#475569" stroke-width="2.2"/>
-          ${capSvg}
-        `;
-      }
-
-      // --- カテゴリ3: ガイワイヤー（支線）のカバー ---
-      else if (id.startsWith("guy_wire_")) {
-        let guardSvg = "";
-        if (id === "guy_wire_01") {
-          // 関西電力：ボトル型（下太・上細）＋黒螺旋
-          guardSvg = `
-            <g transform="translate(420, 215) rotate(-32)">
-              <!-- 上部細筒 -->
-              <rect x="-7" y="-120" width="14" height="95" rx="3" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>
-              <path d="M-7 -105 L7 -92 M-7 -80 L7 -67 M-7 -55 L7 -42" stroke="#111827" stroke-width="5"/>
-              <!-- 下部太筒（ボトル部） -->
-              <path d="M-7 -25 L-15 -12 L-15 115 L15 115 L15 -12 L7 -25 Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.8"/>
-              <path d="M-15 15 L15 32 M-15 55 L15 72 M-15 90 L15 107" stroke="#111827" stroke-width="6"/>
-            </g>
-            <text x="585" y="160" text-anchor="middle" fill="#facc15" font-size="15" font-weight="800">下が太く上が細い「ボトル型」</text>
-          `;
-        } else if (id === "guy_wire_02") {
-          // 中部電力：円筒＋黒黄の縦ストライプ
-          guardSvg = `
-            <g transform="translate(420, 215) rotate(-32)">
-              <rect x="-12" y="-115" width="24" height="230" rx="4" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>
-              <line x1="-6" y1="-113" x2="-6" y2="113" stroke="#111827" stroke-width="4"/>
-              <line x1="0" y1="-113" x2="0" y2="113" stroke="#111827" stroke-width="4"/>
-              <line x1="6" y1="-113" x2="6" y2="113" stroke="#111827" stroke-width="4"/>
-            </g>
-            <text x="590" y="160" text-anchor="middle" fill="#facc15" font-size="15" font-weight="800">平行な「縦縞（縦ストライプ）」</text>
-          `;
-        } else if (id === "guy_wire_03") {
-          // 東北電力：均一円筒＋黒スパイラル
-          guardSvg = `
-            <g transform="translate(420, 215) rotate(-32)">
-              <rect x="-11" y="-115" width="22" height="230" rx="4" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>
-              <path d="M-11 -95 L11 -78 M-11 -55 L11 -38 M-11 -15 L11 2 M-11 25 L11 42 M-11 65 L11 82" stroke="#111827" stroke-width="6"/>
-            </g>
-            <text x="590" y="160" text-anchor="middle" fill="#facc15" font-size="15" font-weight="800">均一な円筒形＋黒螺旋巻き</text>
-          `;
-        } else {
-          // 九州電力：黄色単色カバー＋T字取付金具・三角ステイ
-          guardSvg = `
-            <rect x="278" y="54" width="44" height="10" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
-            <rect x="306" y="42" width="10" height="34" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
-            <g transform="translate(420, 215) rotate(-32)">
-              <rect x="-11" y="-115" width="22" height="225" rx="4" fill="#fde047" stroke="#ca8a04" stroke-width="1.8"/>
-            </g>
-            <polygon points="485,365 520,365 502,328" fill="none" stroke="#cbd5e1" stroke-width="4"/>
-            <text x="580" y="150" text-anchor="middle" fill="#fde047" font-size="15" font-weight="800">黄単色カバー＋T字金具/三角ステイ</text>
-          `;
-        }
-
-        scene = `
-          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
-          <rect y="345" width="${w}" height="75" fill="url(#asphaltGrad)"/>
-          <rect x="242" y="10" width="66" height="350" fill="url(#poleConcrete)"/>
-          <line x1="305" y1="35" x2="505" y2="360" stroke="#94a3b8" stroke-width="4"/>
-          ${guardSvg}
-        `;
-      }
-
-      // --- カテゴリ4: 標識ポールのシール・テープ ---
-      else if (id.startsWith("sign_pole_")) {
-        let stickerSvg = "";
-        if (id === "sign_pole_01") {
-          // 熊本県：赤いリングテープ1本
-          stickerSvg = `
-            <rect x="387" y="238" width="26" height="22" fill="#ef4444" stroke="#b91c1c" stroke-width="1.5"/>
-            <circle cx="400" cy="249" r="46" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,4"/>
-          `;
-        } else if (id === "sign_pole_02") {
-          // 青森県：2本の黄色横ストライプ
-          stickerSvg = `
-            <rect x="387" y="218" width="26" height="16" fill="#facc15" stroke="#ca8a04" stroke-width="1.2"/>
-            <rect x="387" y="254" width="26" height="16" fill="#facc15" stroke="#ca8a04" stroke-width="1.2"/>
-            <circle cx="400" cy="244" r="52" fill="none" stroke="#facc15" stroke-width="2" stroke-dasharray="5,4"/>
-          `;
-        } else if (id === "sign_pole_03") {
-          // 香川県：赤と黄色のストライプテープ
-          stickerSvg = `
-            <rect x="387" y="218" width="26" height="54" fill="#facc15" stroke="#b91c1c" stroke-width="1.2"/>
-            <rect x="387" y="218" width="26" height="11" fill="#ef4444"/>
-            <rect x="387" y="240" width="26" height="11" fill="#ef4444"/>
-            <rect x="387" y="261" width="26" height="11" fill="#ef4444"/>
-          `;
-        } else {
-          // 大分県・宮崎県：緑色の管理ステッカー（標識下部＆ガードレール支柱）
-          stickerSvg = `
-            <rect x="391" y="268" width="18" height="48" rx="2" fill="#16a34a" stroke="#bbf7d0" stroke-width="1.2"/>
-            <!-- ガードレールと支柱の緑シール -->
-            <rect x="520" y="275" width="220" height="36" rx="6" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>
-            <rect x="595" y="311" width="20" height="70" fill="#94a3b8"/>
-            <rect x="598" y="324" width="14" height="34" rx="1" fill="#16a34a" stroke="#bbf7d0" stroke-width="1"/>
-          `;
-        }
-
-        scene = `
-          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
-          <rect y="355" width="${w}" height="65" fill="url(#asphaltGrad)"/>
-          <!-- 白い標識ポール -->
-          <rect x="388" y="115" width="24" height="255" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
-          <!-- 道路標識（制限速度40イメージ） -->
-          <circle cx="400" cy="82" r="46" fill="#f8fafc" stroke="#ef4444" stroke-width="12"/>
-          <text x="400" y="95" text-anchor="middle" fill="#1e3a8a" font-size="36" font-weight="900" font-family="sans-serif">40</text>
-          ${stickerSvg}
-        `;
-      }
-
-      // --- カテゴリ5: 横断歩道のダイヤマーク ---
-      else if (id.startsWith("diamond_")) {
-        let diamondDetail = "";
-        if (id === "diamond_01") {
-          // 茨城・栃木・埼玉：4箇所のスリット入りダイヤ
-          diamondDetail = `
-            <g stroke="#f8fafc" stroke-width="11" fill="none" stroke-linecap="butt">
-              <path d="M400 162 L442 214"/>
-              <path d="M454 229 L468 246 L450 268"/>
-              <path d="M438 283 L400 330 L362 283"/>
-              <path d="M350 268 L332 246 L346 229"/>
-              <path d="M358 214 L400 162"/>
-            </g>
-            <g transform="translate(545, 40)">
-              <rect width="215" height="150" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
-              <text x="107" y="24" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">平面拡大（4箇所スリット）</text>
-              <path d="M107 40 L132 72 M139 81 L147 91 L138 102 M130 112 L107 138 L84 112 M76 102 L67 91 L75 81 M82 72 L107 40" stroke="#f8fafc" stroke-width="5.5" fill="none"/>
-            </g>
-          `;
-        } else if (id === "diamond_02") {
-          // 岡山県：破線ダイヤマーク
-          diamondDetail = `
-            <polygon points="400,160 470,246 400,332 330,246" fill="none" stroke="#f8fafc" stroke-width="11" stroke-dasharray="15,10"/>
-            <g transform="translate(545, 40)">
-              <rect width="215" height="150" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
-              <text x="107" y="24" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">平面拡大（破線セグメント）</text>
-              <polygon points="107,40 148,90 107,138 66,90" fill="none" stroke="#f8fafc" stroke-width="5.5" stroke-dasharray="9,6"/>
-            </g>
-          `;
-        } else if (id === "diamond_03") {
-          // 北海道：太く閉じた大型ダイヤ＋赤白矢羽根（固定式視線誘導柱）
-          diamondDetail = `
-            <polygon points="400,158 478,246 400,336 322,246" fill="none" stroke="#f8fafc" stroke-width="16" stroke-linejoin="miter"/>
-            <!-- 矢羽根（スノーポール） -->
-            <path d="M175 260 L175 68 L235 68" fill="none" stroke="#cbd5e1" stroke-width="7"/>
-            <g transform="translate(232, 72)">
-              <polygon points="0,0 18,0 18,36 30,36 9,64 -12,36 0,36" fill="#ef4444" stroke="#f8fafc" stroke-width="2.5"/>
-              <rect x="0" y="14" width="18" height="14" fill="#f8fafc"/>
-            </g>
-          `;
-        } else {
-          // 富山・石川：4つの頂点が大きく開いた排水スリット型
-          diamondDetail = `
-            <g stroke="#f8fafc" stroke-width="12" fill="none" stroke-linecap="square">
-              <line x1="414" y1="176" x2="458" y2="230"/>
-              <line x1="458" y1="262" x2="414" y2="316"/>
-              <line x1="386" y1="316" x2="342" y2="262"/>
-              <line x1="342" y1="230" x2="386" y2="176"/>
-            </g>
-            <g transform="translate(545, 40)">
-              <rect width="215" height="150" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
-              <text x="107" y="24" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">頂点開放型（融雪・排水仕様）</text>
-              <g stroke="#f8fafc" stroke-width="5.5">
-                <line x1="115" y1="48" x2="142" y2="82"/>
-                <line x1="142" y1="98" x2="115" y2="132"/>
-                <line x1="99" y1="132" x2="72" y2="98"/>
-                <line x1="72" y1="82" x2="99" y2="48"/>
-              </g>
-            </g>
-          `;
-        }
-
-        scene = `
-          <rect width="${w}" height="125" fill="url(#skyGrad)"/>
-          <rect y="125" width="${w}" height="295" fill="#1e293b"/>
-          <polygon points="270,125 530,125 740,420 60,420" fill="#334155"/>
-          <line x1="282" y1="125" x2="95" y2="420" stroke="#f8fafc" stroke-width="5"/>
-          <line x1="518" y1="125" x2="705" y2="420" stroke="#f59e0b" stroke-width="5"/>
-          ${diamondDetail}
-        `;
-      }
-
-      // --- カテゴリ6: 「止まれ」の路面標示 ---
-      else if (id.startsWith("tomare_")) {
-        let tomareDetail = "";
-        if (id === "tomare_01") {
-          // 関西型：「れ」が離れ型
-          tomareDetail = `
-            <text x="275" y="275" fill="#f8fafc" font-size="76" font-weight="900" font-family="sans-serif">止ま</text>
-            <!-- 離れ型の「れ」をパスで正確に描画 -->
-            <g transform="translate(445, 208)" stroke="#f8fafc" stroke-width="10" fill="none" stroke-linecap="square" stroke-linejoin="miter">
-              <!-- 左の縦棒＋短い横棒（右と分離！） -->
-              <line x1="18" y1="4" x2="18" y2="68"/>
-              <line x1="4" y1="24" x2="26" y2="24"/>
-              <!-- 離れた右パーツ -->
-              <path d="M42 26 L62 14 L42 54 L66 24 L66 60 Q66 68 78 66"/>
-            </g>
-            <circle cx="486" cy="245" r="46" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="5,4"/>
-            <text x="400" y="348" text-anchor="middle" fill="#38bdf8" font-size="15" font-weight="800">着眼点：「れ」の縦棒と右パーツが明確に分離（離れ型）</text>
-          `;
-        } else if (id === "tomare_02") {
-          // 京都府：「れ」がくっつき型（角張り）
-          tomareDetail = `
-            <text x="275" y="275" fill="#f8fafc" font-size="76" font-weight="900" font-family="sans-serif">止ま</text>
-            <g transform="translate(445, 208)" stroke="#f8fafc" stroke-width="10" fill="none" stroke-linecap="square" stroke-linejoin="miter">
-              <!-- 一体化したくっつき型の「れ」 -->
-              <line x1="20" y1="4" x2="20" y2="68"/>
-              <path d="M4 24 L58 18 L20 52 L64 22 L64 62 L78 62"/>
-            </g>
-            <circle cx="486" cy="245" r="46" fill="none" stroke="#facc15" stroke-width="2.5" stroke-dasharray="5,4"/>
-            <text x="400" y="348" text-anchor="middle" fill="#facc15" font-size="15" font-weight="800">着眼点：「れ」の1画目と2画目がガッチリ結合（くっつき型）</text>
-          `;
-        } else if (id === "tomare_03") {
-          // 沖縄県：白っぽい石灰岩アスファルト＋白枠囲み「止まれ」
-          tomareDetail = `
-            <rect x="90" y="130" width="620" height="270" fill="#64748b" opacity="0.55"/>
-            <rect x="210" y="178" width="380" height="128" fill="rgba(220,38,38,0.28)" stroke="#f8fafc" stroke-width="9"/>
-            <text x="400" y="266" text-anchor="middle" fill="#f8fafc" font-size="72" font-weight="900" letter-spacing="8" font-family="sans-serif">止まれ</text>
-            <text x="400" y="352" text-anchor="middle" fill="#f8fafc" font-size="15" font-weight="800">白っぽい石灰岩骨材アスファルト ＋ 四角い白枠囲み</text>
-          `;
-        } else {
-          // 東京都・神奈川県：狭隘生活道路の小型「止まれ」
-          tomareDetail = `
-            <text x="400" y="256" text-anchor="middle" fill="#f8fafc" font-size="42" font-weight="800" letter-spacing="3" font-family="sans-serif">止まれ</text>
-            <rect x="315" y="212" width="170" height="58" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5,4"/>
-            <text x="400" y="335" text-anchor="middle" fill="#38bdf8" font-size="15" font-weight="700">車線幅に対して凝縮されたコンパクトな首都圏小型サイズ</text>
-          `;
-        }
-
-        scene = `
-          <rect width="${w}" height="110" fill="url(#skyGrad)"/>
-          <rect y="110" width="${w}" height="310" fill="#273449"/>
-          <line x1="160" y1="152" x2="640" y2="152" stroke="#f8fafc" stroke-width="14"/>
-          <line x1="140" y1="110" x2="60" y2="420" stroke="#cbd5e1" stroke-width="5"/>
-          <line x1="660" y1="110" x2="740" y2="420" stroke="#cbd5e1" stroke-width="5"/>
-          ${tomareDetail}
-        `;
-      }
-
-      // --- カテゴリ7: 擁壁のブロック模様 ---
-      else if (id.startsWith("wall_")) {
-        let wallDetail = "";
-        if (id === "wall_01") {
-          // 広島・山口：明るい灰白色の六角形（亀甲型）ブロック擁壁
-          let hexes = "";
-          const r = 34;
-          const dx = 58;
-          const dy = 50;
-          for (let row = 0; row < 5; row++) {
-            for (let col = 0; col < 11; col++) {
-              const cx = 80 + col * dx + (row % 2 === 1 ? dx / 2 : 0);
-              const cy = 95 + row * dy;
-              const pts = [];
-              for (let k = 0; k < 6; k++) {
-                const ang = (Math.PI / 180) * (60 * k - 30);
-                pts.push(`${(cx + r * Math.cos(ang)).toFixed(1)},${(cy + r * Math.sin(ang)).toFixed(1)}`);
-              }
-              hexes += `<polygon points="${pts.join(" ")}" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/>`;
-              hexes += `<polygon points="${pts.join(" ")}" transform="translate(${cx},${cy}) scale(0.68) translate(${-cx},${-cy})" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>`;
-            }
-          }
-          wallDetail = `
-            <rect y="45" width="${w}" height="295" fill="#94a3b8"/>
-            ${hexes}
-            <circle cx="255" cy="245" r="7" fill="#1e293b"/>
-            <circle cx="545" cy="245" r="7" fill="#1e293b"/>
-          `;
-        } else if (id === "wall_02") {
-          // 長崎県：黒っぽい火山岩系ブロック＋十字・四つ目突起模様の間知ブロック
-          let blocks = "";
-          for (let row = 0; row < 5; row++) {
-            for (let col = 0; col < 9; col++) {
-              const bx = 55 + col * 82 + (row % 2) * 41;
-              const by = 62 + row * 54;
-              blocks += `
-                <g transform="translate(${bx}, ${by})">
-                  <rect width="78" height="50" rx="3" fill="#475569" stroke="#1e293b" stroke-width="3"/>
-                  <rect x="12" y="9" width="22" height="13" fill="#64748b"/>
-                  <rect x="44" y="9" width="22" height="13" fill="#64748b"/>
-                  <rect x="12" y="28" width="22" height="13" fill="#64748b"/>
-                  <rect x="44" y="28" width="22" height="13" fill="#64748b"/>
-                </g>
-              `;
-            }
-          }
-          wallDetail = `
-            <rect y="50" width="${w}" height="290" fill="#1e293b"/>
-            ${blocks}
-          `;
-        } else {
-          // 神奈川・静岡：丸い川石を埋め込んだ玉石コンクリート擁壁
-          let cobbles = "";
-          for (let row = 0; row < 6; row++) {
-            for (let col = 0; col < 13; col++) {
-              const cx = 52 + col * 58 + (row % 2) * 28;
-              const cy = 82 + row * 44;
-              const rx = 21 + ((row + col) % 3) * 2;
-              const ry = 16 + ((row * col) % 3) * 1.5;
-              const shade = (row + col) % 2 === 0 ? "#94a3b8" : "#78879b";
-              cobbles += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${shade}" stroke="#475569" stroke-width="2.5"/>`;
-            }
-          }
-          wallDetail = `
-            <path d="M0 55 Q240 20 520 45 T800 35 L800 75 L0 75 Z" fill="#15803d" opacity="0.75"/>
-            <rect y="62" width="${w}" height="278" fill="#64748b"/>
-            ${cobbles}
-          `;
-        }
-
+      if (q.svgKey && GUYWIRE_SHAPES[q.svgKey]) {
+        // ガイワイヤー：原図（viewBox 0 0 60 120）を拡大表示
         scene = `
           <rect width="${w}" height="${h}" fill="#0f172a"/>
-          ${wallDetail}
-          <rect y="340" width="${w}" height="80" fill="url(#asphaltGrad)"/>
-          <line x1="0" y1="352" x2="${w}" y2="352" stroke="#cbd5e1" stroke-width="4"/>
+          <g transform="translate(300, 4) scale(3.4)">
+            <line x1="0" y1="113" x2="60" y2="113" stroke="#64748b" stroke-width="1"/>
+            <g transform="rotate(16 15 113)">
+              <line x1="15" y1="-9" x2="15" y2="113" stroke="#94a3b8" stroke-width="0.8"/>
+              ${GUYWIRE_SHAPES[q.svgKey]}
+            </g>
+          </g>
+          <text x="24" y="400" fill="#64748b" font-size="13">図：geopinning.space の簡略図と同じ形状（見分けやすいように簡略化したもの）</text>
         `;
-      }
-
-      // --- カスタム追加問題用の汎用SVGフォールバック ---
-      else {
+      } else {
+        // 出題カード（hint テキストのみ。独自の図は描かない）
+        const hasHint = q.hint && String(q.hint).trim() !== "";
+        const bodyLines = hasHint
+          ? wrapTextLines(q.hint, 30)
+          : ["この問題は geopinning.space の写真・図のみで出題されます。", "オンライン環境で画像を読み込んでください。"];
+        const startY = 210 - (bodyLines.length - 1) * 17;
+        const textEls = bodyLines
+          .map((line, i) => `<text x="400" y="${startY + i * 34}" text-anchor="middle" fill="#e2e8f0" font-size="21" font-weight="700">${escapeHtml(line)}</text>`)
+          .join("");
+        const note = q.imageUrl
+          ? "画像を読み込めないため、原文の見た目の記述で出題しています"
+          : "原文の記述にもとづく文章問題です";
         scene = `
-          <rect width="${w}" height="${h}" fill="url(#skyGrad)"/>
-          <rect x="140" y="70" width="520" height="280" rx="14" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
-          <text x="400" y="185" text-anchor="middle" fill="#38bdf8" font-size="22" font-weight="800">${escapeHtml(q.category)}</text>
-          <text x="400" y="225" text-anchor="middle" fill="#cbd5e1" font-size="15">ID: ${escapeHtml(q.id)}（SVGプレースホルダー）</text>
+          <rect width="${w}" height="${h}" fill="#0f172a"/>
+          <rect x="40" y="40" width="720" height="340" rx="16" fill="#111c33" stroke="#38bdf8" stroke-width="2"/>
+          <text x="400" y="88" text-anchor="middle" fill="#38bdf8" font-size="20" font-weight="800">${escapeHtml(q.category)}</text>
+          ${textEls}
+          <text x="400" y="340" text-anchor="middle" fill="#64748b" font-size="13">${escapeHtml(note)}</text>
+          <text x="400" y="362" text-anchor="middle" fill="#64748b" font-size="12">出典: GeoGuessrの攻略めも (geopinning.space)</text>
         `;
       }
 
       return `
-        <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeHtml(q.category)} 視覚メタ図解">
-          ${commonDefs}
+        <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeHtml(q.category)} 図解">
           ${scene}
         </svg>
       `;
@@ -2273,8 +2263,9 @@
     /* =========================================================================
      * 4. 状態管理・localStorage永続化・Anki間隔反復（SM-2ベース）
      * ========================================================================= */
-    const STORAGE_KEY_SRS = "geoanki_jp_srs_v1";
-    const STORAGE_KEY_CUSTOM_Q = "geoanki_jp_custom_questions_v1";
+    // v2: geopinning.space 準拠の問題データへ全面差し替え（旧データのキャッシュを無視するためキーを更新）
+    const STORAGE_KEY_SRS = "geoanki_jp_srs_v2";
+    const STORAGE_KEY_CUSTOM_Q = "geoanki_jp_custom_questions_v2";
 
     let questionsPool = loadQuestionsPool();
     let srsState = loadSrsState();

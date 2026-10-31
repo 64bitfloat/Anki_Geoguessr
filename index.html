@@ -1161,6 +1161,132 @@
       font-size: 0.78rem;
       margin-top: 8px;
     }
+/* =========================================================================
+ * 9. カテゴリ選択スタート画面用スタイル
+ * ========================================================================= */
+.start-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.start-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.start-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.start-desc {
+  font-size: 0.88rem;
+  color: var(--text-sub);
+}
+
+.start-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cat-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.cat-select-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #1e293b;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.cat-select-card:hover {
+  background: #253349;
+  border-color: #475569;
+}
+
+.cat-select-card.selected {
+  background: rgba(14, 165, 233, 0.12);
+  border-color: var(--accent);
+}
+
+.cat-select-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  pointer-events: none;
+}
+
+.cat-select-info {
+  flex: 1;
+}
+
+.cat-select-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 3px;
+}
+
+.cat-select-meta {
+  font-size: 0.76rem;
+  color: var(--text-sub);
+}
+
+.cat-select-card.selected .cat-select-meta {
+  color: #7dd3fc;
+}
+
+.start-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-direction: column;
+}
+
+.btn-start-study {
+  padding: 14px 40px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-start-study:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.55);
+}
+
+.btn-start-study:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
   </style>
 </head>
 <body>
@@ -1179,6 +1305,7 @@
           <kbd>Space</kbd>/<kbd>Enter</kbd> 判定・次へ
           <kbd>1</kbd>〜<kbd>4</kbd> 復習評価
         </span>
+        <button type="button" id="btnChangeCategories" class="btn-ghost" style="border-color:var(--accent);color:#7dd3fc;font-weight:700;">📚 学習項目を変更</button>
         <select id="studyModeSelect" class="mode-select" aria-label="出題モード切替">
           <option value="due">通常学習（期限到来＋新規優先）</option>
           <option value="all">全問演習（シャッフル一巡）</option>
@@ -1193,6 +1320,30 @@
   <main class="main-container">
     <!-- Main Quiz Column -->
     <section class="quiz-panel" aria-live="polite">
+      <!-- Category Selection Start Screen -->
+      <div id="categorySelectScreen" class="start-panel">
+        <div class="start-header">
+          <div class="start-title">🎯 学習する視覚メタ項目を選択</div>
+          <div class="start-desc">集中して覚えたい項目を選択して「学習を開始」を押してください（複数選択・1項目のみどちらも可能）。</div>
+        </div>
+
+        <div class="start-tools">
+          <div style="display:flex;gap:8px;">
+            <button type="button" id="btnSelectAllCats" class="btn-ghost" style="font-size:0.8rem;padding:5px 12px;">全選択</button>
+            <button type="button" id="btnClearAllCats" class="btn-ghost" style="font-size:0.8rem;padding:5px 12px;">全解除</button>
+          </div>
+          <div id="selectedCatSummary" style="font-size:0.88rem;font-weight:700;color:var(--accent);">
+            選択中: 0項目 (0問)
+          </div>
+        </div>
+
+        <div id="catSelectGrid" class="cat-select-grid"></div>
+
+        <div class="start-footer">
+          <button type="button" id="btnStartStudySession" class="btn-start-study">🚀 選択した項目で学習を開始</button>
+        </div>
+      </div>
+
       <div id="quizActiveView">
         <div class="quiz-topbar">
           <div class="badge-group">
@@ -2230,6 +2381,32 @@
     // v2: geopinning.space 準拠の問題データへ全面差し替え（旧データのキャッシュを無視するためキーを更新）
     const STORAGE_KEY_SRS = "geoanki_jp_srs_v3";
     const STORAGE_KEY_CUSTOM_Q = "geoanki_jp_custom_questions_v3";
+    const STORAGE_KEY_SELECTED_CATS = "geoanki_jp_selected_cats_v3";
+
+    function loadSelectedCategories() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_SELECTED_CATS);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return new Set(parsed);
+          }
+        }
+      } catch (e) {
+        console.warn("選択カテゴリの復元に失敗しました:", e);
+      }
+      return new Set(CATEGORIES);
+    }
+
+    function saveSelectedCategories() {
+      try {
+        localStorage.setItem(STORAGE_KEY_SELECTED_CATS, JSON.stringify([...selectedCategories]));
+      } catch (e) {
+        console.warn("選択カテゴリの保存に失敗しました:", e);
+      }
+    }
+
+    let selectedCategories = loadSelectedCategories();
 
     let questionsPool = loadQuestionsPool();
     let srsState = loadSrsState();
@@ -2394,6 +2571,93 @@
         dueReviews.sort((a, b) => getCardRecord(a.id).dueAt - getCardRecord(b.id).dueAt);
         studyQueue = [...dueReviews, ...shuffleArray(newCards)];
       }
+    }
+
+    
+    /* =========================================================================
+     * カテゴリ選択スタート画面制御
+     * ========================================================================= */
+    function showCategorySelectScreen() {
+      const selectScreen = document.getElementById("categorySelectScreen");
+      const activeView = document.getElementById("quizActiveView");
+      const completeView = document.getElementById("quizCompleteView");
+
+      if (selectScreen) selectScreen.style.display = "block";
+      if (activeView) activeView.style.display = "none";
+      if (completeView) completeView.classList.remove("visible");
+
+      renderCategorySelectGrid();
+    }
+
+    function renderCategorySelectGrid() {
+      const grid = document.getElementById("catSelectGrid");
+      if (!grid) return;
+
+      grid.innerHTML = "";
+
+      let totalSelectedQuestions = 0;
+
+      CATEGORIES.forEach((cat) => {
+        const count = questionsPool.filter((q) => q.category === cat).length;
+        const isSelected = selectedCategories.has(cat);
+        if (isSelected) totalSelectedQuestions += count;
+
+        const isPower = cat.includes("電柱");
+        const typeDesc = isPower ? "電力会社 選択（10択）" : "都道府県 選択（完全一致）";
+
+        const card = document.createElement("div");
+        card.className = "cat-select-card" + (isSelected ? " selected" : "");
+        card.setAttribute("role", "checkbox");
+        card.setAttribute("aria-checked", isSelected ? "true" : "false");
+        card.innerHTML = `
+          <input type="checkbox" class="cat-select-checkbox" ${isSelected ? "checked" : ""} aria-hidden="true" />
+          <div class="cat-select-info">
+            <div class="cat-select-name">${escapeHtml(cat)}</div>
+            <div class="cat-select-meta">${typeDesc} • ${count}問</div>
+          </div>
+        `;
+
+        card.addEventListener("click", () => {
+          if (selectedCategories.has(cat)) {
+            selectedCategories.delete(cat);
+          } else {
+            selectedCategories.add(cat);
+          }
+          renderCategorySelectGrid();
+        });
+
+        grid.appendChild(card);
+      });
+
+      // サマリーテキストと開始ボタンの状態
+      const summaryEl = document.getElementById("selectedCatSummary");
+      const startBtn = document.getElementById("btnStartStudySession");
+
+      if (summaryEl) {
+        summaryEl.textContent = `選択中: ${selectedCategories.size} / ${CATEGORIES.length}項目 (${totalSelectedQuestions}問)`;
+      }
+      if (startBtn) {
+        startBtn.disabled = selectedCategories.size === 0;
+        startBtn.textContent = selectedCategories.size === 0
+          ? "項目を1つ以上選択してください"
+          : `🚀 選択した ${selectedCategories.size} 項目 (${totalSelectedQuestions}問) で学習を開始`;
+      }
+    }
+
+    function startStudyWithSelectedCategories() {
+      if (selectedCategories.size === 0) {
+        showToast("⚠️ 学習項目を1つ以上選択してください");
+        return;
+      }
+
+      saveSelectedCategories();
+
+      const selectScreen = document.getElementById("categorySelectScreen");
+      if (selectScreen) selectScreen.style.display = "none";
+
+      activeCategoryFilter = null;
+      buildStudyQueue();
+      loadNextQuestion();
     }
 
     function loadNextQuestion() {
@@ -3012,6 +3276,35 @@
       const dataModal = document.getElementById("dataModal");
       const jsonEditor = document.getElementById("jsonEditorArea");
 
+      
+      // 学習項目選択関連
+      const btnChangeCats = document.getElementById("btnChangeCategories");
+      if (btnChangeCats) {
+        btnChangeCats.addEventListener("click", () => showCategorySelectScreen());
+      }
+      const btnDoneChange = document.getElementById("btnDoneChangeCats");
+      if (btnDoneChange) {
+        btnDoneChange.addEventListener("click", () => showCategorySelectScreen());
+      }
+      const btnSelectAll = document.getElementById("btnSelectAllCats");
+      if (btnSelectAll) {
+        btnSelectAll.addEventListener("click", () => {
+          CATEGORIES.forEach(c => selectedCategories.add(c));
+          renderCategorySelectGrid();
+        });
+      }
+      const btnClearAll = document.getElementById("btnClearAllCats");
+      if (btnClearAll) {
+        btnClearAll.addEventListener("click", () => {
+          selectedCategories.clear();
+          renderCategorySelectGrid();
+        });
+      }
+      const btnStartSession = document.getElementById("btnStartStudySession");
+      if (btnStartSession) {
+        btnStartSession.addEventListener("click", () => startStudyWithSelectedCategories());
+      }
+
       document.getElementById("btnOpenDataModal").addEventListener("click", () => {
         jsonEditor.value = JSON.stringify(questionsPool, null, 2);
         dataModal.classList.add("open");
@@ -3118,8 +3411,8 @@
 
     // 初期化実行
     setupEventListeners();
-    buildStudyQueue();
-    loadNextQuestion();
+    updateDashboardStats();
+    showCategorySelectScreen();
   </script>
 </body>
 </html>

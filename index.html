@@ -4290,8 +4290,13 @@ aside.sidebar {
 
 
     function setQuizStep(step) {
+      const isPractice = studyMode === "practice";
+
       if (step === "question") {
         quizPhase = "answering";
+        // ステップバッジ更新 (練習モードは2ステップ、通常学習は3ステップ)
+        const qStepBadge = document.querySelector("#screenQuestion .step-badge");
+        if (qStepBadge) qStepBadge.textContent = isPractice ? "1/2 問題" : "1/3 問題";
         setActiveScreen("question");
       } else if (step === "explanation") {
         quizPhase = "explanation";
@@ -4302,6 +4307,17 @@ aside.sidebar {
           if (catEl) catEl.textContent = currentQuestion.category;
           if (idEl) idEl.textContent = "#" + currentQuestion.id;
         }
+        const expStepBadge = document.querySelector("#screenExplanation .step-badge");
+        if (expStepBadge) expStepBadge.textContent = isPractice ? "2/2 解説" : "2/3 正解・解説";
+
+        // 全問練習モードならボタンを「次の問題へ 👉」、通常学習なら「復習評価へ進む 👉」
+        const btnProceed = document.getElementById("btnProceedToRating");
+        if (btnProceed) {
+          btnProceed.innerHTML = isPractice
+            ? '<span>次の問題へ 👉</span><kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>'
+            : '<span>復習評価へ進む 👉</span><kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>';
+        }
+
         setActiveScreen("explanation");
       } else if (step === "rating") {
         quizPhase = "rating";
@@ -4341,6 +4357,22 @@ aside.sidebar {
 
     function proceedToRating() {
       if (quizPhase !== "explanation") return;
+
+      // ★全問練習モード時は推奨評価画面を完全にスキップして次の問題へ直行！
+      if (studyMode === "practice") {
+        const q = currentQuestion;
+        studyQueue.shift(); // 現在の問題をキューから取り出す
+
+        if (!lastIsCorrect && q) {
+          // 不正解の場合は演習セッション内で再復習できるようキューの数問後ろへ再挿入
+          const reinsertIdx = Math.min(studyQueue.length, 3);
+          studyQueue.splice(reinsertIdx, 0, q);
+        }
+
+        loadNextQuestion();
+        return;
+      }
+
       setQuizStep("rating");
     }
 

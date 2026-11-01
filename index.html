@@ -1287,6 +1287,156 @@
   box-shadow: none;
 }
 
+
+/* =========================================================================
+ * 10.5 スクロール不要 3ステップ切り替えUIスタイル
+ * ========================================================================= */
+.step-badge {
+  background: rgba(14, 165, 233, 0.16);
+  color: var(--accent);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.quiz-step-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ステップ1: 問題・回答画面 */
+.step-question-scroll {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 14px;
+}
+
+/* ステップ2: 正解・解説画面 */
+.step-explanation-body {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step-footer-bar {
+  padding: 14px 20px;
+  background: rgba(15, 23, 42, 0.95);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.btn-proceed {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  color: #0b1120;
+  font-weight: 800;
+  font-size: 1rem;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 13px 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-proceed:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.6);
+}
+
+/* ステップ3: 復習評価画面 */
+.step-rating-body {
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-height: 420px;
+}
+
+.rating-prompt-card {
+  text-align: center;
+  max-width: 540px;
+}
+
+.rating-prompt-icon {
+  font-size: 2.8rem;
+  margin-bottom: 8px;
+}
+
+.rating-prompt-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.rating-prompt-sub {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+
+.rating-big-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  width: 100%;
+  max-width: 720px;
+}
+
+.rating-big-grid .anki-btn {
+  padding: 20px 14px;
+  min-height: 100px;
+  justify-content: center;
+  position: relative;
+}
+
+.rating-big-grid .anki-title {
+  font-size: 1.25rem;
+}
+
+.rating-big-grid .anki-interval {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+/* 推奨評価のハイライト */
+.rating-big-grid .anki-btn.recommended-anki {
+  box-shadow: 0 0 0 2.5px var(--accent), 0 8px 24px rgba(56, 189, 248, 0.4);
+  transform: translateY(-3px);
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.rating-big-grid .anki-btn.recommended-anki::before {
+  content: "推奨評価";
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  background: var(--accent);
+  color: #0b1120;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
 /* =========================================================================
  * 10. スマホ版（モバイル）最適化スタイル
  * ========================================================================= */
@@ -1625,6 +1775,161 @@
   }
 }
 
+  
+/* モバイル表示時のスクロール不要（No-Scroll 100dvh）最適化 */
+@media (max-width: 768px) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .main-container {
+    height: calc(100dvh - 52px);
+    overflow: hidden;
+    padding: 6px 6px 8px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .quiz-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  #quizActiveView {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .quiz-topbar {
+    padding: 8px 10px;
+    flex-shrink: 0;
+  }
+
+  .quiz-step-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ステップ1: 問題・回答画面 */
+  .step-question-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 10px 6px 10px;
+    gap: 8px;
+  }
+
+  .question-title {
+    font-size: 0.98rem;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .visual-stage {
+    min-height: 140px;
+    max-height: 26vh;
+    margin-bottom: 8px;
+  }
+
+  .power-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .power-btn {
+    padding: 9px 6px;
+    min-height: 44px;
+    font-size: 0.85rem;
+  }
+
+  .step-footer-bar {
+    padding: 8px 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-submit, .btn-proceed {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.98rem;
+    justify-content: center;
+  }
+
+  /* ステップ2: 正解と解説画面 */
+  .step-explanation-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 10px;
+    gap: 12px;
+  }
+
+  .result-banner {
+    padding: 10px 12px;
+    margin-bottom: 2px;
+  }
+
+  .result-verdict {
+    font-size: 1.12rem;
+  }
+
+  /* ステップ3: 復習評価画面 */
+  .step-rating-body {
+    flex: 1;
+    padding: 16px 12px;
+    gap: 16px;
+    justify-content: center;
+    min-height: auto;
+  }
+
+  .rating-prompt-icon {
+    font-size: 2.2rem;
+    margin-bottom: 4px;
+  }
+
+  .rating-prompt-title {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+
+  .rating-prompt-sub {
+    font-size: 0.82rem;
+  }
+
+  .rating-big-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-width: 100%;
+  }
+
+  .rating-big-grid .anki-btn {
+    padding: 16px 8px;
+    min-height: 80px;
+  }
+
+  .rating-big-grid .anki-title {
+    font-size: 1.05rem;
+  }
+
+  .rating-big-grid .anki-interval {
+    font-size: 0.82rem;
+  }
+
+  /* サイドバー（モバイルでは非表示） */
+  aside.sidebar {
+    display: none !important;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -1737,101 +2042,126 @@
             <span id="qTypeBadge" class="type-badge">回答形式</span>
           </div>
           <div class="badge-group">
+            <span id="quizStepIndicator" class="step-badge">1/3 問題</span>
             <span id="qIdBadge" class="srs-badge">#ID</span>
             <span id="qSrsBadge" class="srs-badge">新規カード</span>
           </div>
         </div>
 
-        <div class="quiz-body">
-          <h1 id="qQuestionText" class="question-title">読み込み中...</h1>
+        <!-- ステップ1: 問題・回答画面 -->
+        <div id="stepQuestionView" class="quiz-step-view">
+          <div class="step-question-scroll">
+            <h1 id="qQuestionText" class="question-title">読み込み中...</h1>
 
-          <div class="visual-stage" id="visualStage">
-            <div id="svgFallbackContainer" style="width:100%;"></div>
-            <img id="externalQuestionImg" class="external-photo" alt="出題メタ画像" />
-            <div class="visual-tools">
-              <button type="button" id="btnToggleVisualSource" class="visual-tool-btn" style="display:none;">SVG図解切替</button>
-              <button type="button" id="btnZoomVisual" class="visual-tool-btn">🔍 拡大表示</button>
+            <div class="visual-stage" id="visualStage">
+              <div id="svgFallbackContainer" style="width:100%;"></div>
+              <img id="externalQuestionImg" class="external-photo" alt="出題メタ画像" />
+              <div class="visual-tools">
+                <button type="button" id="btnToggleVisualSource" class="visual-tool-btn" style="display:none;">SVG図解切替</button>
+                <button type="button" id="btnZoomVisual" class="visual-tool-btn">🔍 拡大表示</button>
+              </div>
             </div>
-          </div>
 
-          <!-- Answer Header -->
-          <div class="answer-header">
-            <div id="answerInstruction" class="answer-instruction">該当する選択肢を選んでください</div>
-            <div class="answer-quick-actions" id="prefQuickTools" style="display:none;">
-              <span id="prefSelectedCounter" class="selection-counter">選択中: 0</span>
-              <button type="button" id="btnExpandAllRegions" class="btn-ghost" style="padding:4px 9px;font-size:0.75rem;">全地方 開閉</button>
-              <button type="button" id="btnClearPrefSelection" class="btn-ghost" style="padding:4px 9px;font-size:0.75rem;">選択クリア</button>
+            <!-- Answer Header -->
+            <div class="answer-header">
+              <div id="answerInstruction" class="answer-instruction">該当する選択肢を選んでください</div>
+              <div class="answer-quick-actions" id="prefQuickTools" style="display:none;">
+                <span id="prefSelectedCounter" class="selection-counter">選択中: 0</span>
+                <button type="button" id="btnExpandAllRegions" class="btn-ghost" style="padding:4px 9px;font-size:0.75rem;">全地方 開閉</button>
+                <button type="button" id="btnClearPrefSelection" class="btn-ghost" style="padding:4px 9px;font-size:0.75rem;">選択クリア</button>
+              </div>
             </div>
+
+            <!-- Dynamic Input Area -->
+            <div id="typeAContainer" class="power-grid" style="display:none;"></div>
+            <div id="typeBContainer" class="regions-wrapper" style="display:none;"></div>
           </div>
 
-          <!-- Diff Legend for Prefecture Grading -->
-          <div id="diffLegend" class="diff-legend">
-            <span style="font-weight:700;color:var(--text-sub);">判定内訳:</span>
-            <span class="legend-item"><span class="legend-swatch swatch-hit"></span>緑：正解（一致）</span>
-            <span class="legend-item"><span class="legend-swatch swatch-extra"></span>赤：誤答（過剰選択）</span>
-            <span class="legend-item"><span class="legend-swatch swatch-missed"></span>黄枠：見落とし（不足選択）</span>
-          </div>
-
-          <!-- Dynamic Input Area -->
-          <div id="typeAContainer" class="power-grid" style="display:none;"></div>
-          <div id="typeBContainer" class="regions-wrapper" style="display:none;"></div>
-
-          <!-- Submit Button -->
-          <div id="submitBar" class="submit-bar">
+          <!-- Submit Button Fixed Footer -->
+          <div id="submitBar" class="step-footer-bar">
             <button type="button" id="btnSubmitAnswer" class="btn-submit">
               <span>回答する</span>
               <kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>
             </button>
           </div>
+        </div>
 
-          <!-- Result & Anki Evaluation -->
-          <div id="resultPanel" class="result-panel">
+        <!-- ステップ2: 正解と解説画面 -->
+        <div id="stepExplanationView" class="quiz-step-view" style="display:none;">
+          <div class="step-explanation-body">
             <div id="resultBanner" class="result-banner">
               <div id="resultVerdict" class="result-verdict"></div>
               <div id="resultSummarySub" style="font-size:0.82rem;"></div>
             </div>
-            <div class="result-content">
-              <div class="correct-answer-box">
-                <div class="box-label">正解データ</div>
-                <div id="correctAnswerPills" class="correct-pills"></div>
-              </div>
 
-              <div class="explanation-box">
-                <div class="box-label" style="color:var(--accent);">解説・着眼点（メタの特徴）</div>
-                <div id="explanationText"></div>
-                <div style="margin-top:8px;font-size:0.76rem;color:var(--text-sub);">
-                  出典: <a href="https://geopinning.space/rule/asia/japan/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GeoGuessrの攻略めも (geopinning.space)</a>
-                </div>
-              </div>
+            <!-- Diff Legend for Prefecture Grading -->
+            <div id="diffLegend" class="diff-legend">
+              <span style="font-weight:700;color:var(--text-sub);">判定内訳:</span>
+              <span class="legend-item"><span class="legend-swatch swatch-hit"></span>緑：正解（一致）</span>
+              <span class="legend-item"><span class="legend-swatch swatch-extra"></span>赤：誤答（過剰選択）</span>
+              <span class="legend-item"><span class="legend-swatch swatch-missed"></span>黄枠：見落とし（不足選択）</span>
+            </div>
 
-              <div class="anki-section">
-                <div class="anki-header">
-                  <span>記憶の定着度を評価して次へ進む（復習間隔に自動反映）</span>
-                  <span><kbd>Space</kbd> で推奨評価を選択</span>
-                </div>
-                <div class="anki-grid">
-                  <button type="button" class="anki-btn again" data-rating="again">
-                    <span class="anki-title">Again</span>
-                    <span class="anki-interval" id="ivAgain">再出題 (&lt;1分)</span>
-                    <span class="anki-key">[1] もう一度</span>
-                  </button>
-                  <button type="button" class="anki-btn hard" data-rating="hard">
-                    <span class="anki-title">Hard</span>
-                    <span class="anki-interval" id="ivHard">6時間</span>
-                    <span class="anki-key">[2] 難しい</span>
-                  </button>
-                  <button type="button" class="anki-btn good" data-rating="good">
-                    <span class="anki-title">Good</span>
-                    <span class="anki-interval" id="ivGood">1日</span>
-                    <span class="anki-key">[3] 普通</span>
-                  </button>
-                  <button type="button" class="anki-btn easy" data-rating="easy">
-                    <span class="anki-title">Easy</span>
-                    <span class="anki-interval" id="ivEasy">4日</span>
-                    <span class="anki-key">[4] 簡単</span>
-                  </button>
-                </div>
+            <div class="correct-answer-box">
+              <div class="box-label">正解データ</div>
+              <div id="correctAnswerPills" class="correct-pills"></div>
+            </div>
+
+            <div class="explanation-box">
+              <div class="box-label" style="color:var(--accent);">解説・着眼点（メタの特徴）</div>
+              <div id="explanationText"></div>
+              <div style="margin-top:8px;font-size:0.76rem;color:var(--text-sub);">
+                出典: <a href="https://geopinning.space/rule/asia/japan/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GeoGuessrの攻略めも (geopinning.space)</a>
               </div>
+            </div>
+          </div>
+
+          <div class="step-footer-bar">
+            <button type="button" id="btnProceedToRating" class="btn-proceed">
+              <span>復習評価へ進む 👉</span>
+              <kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>
+            </button>
+          </div>
+        </div>
+
+        <!-- ステップ3: 復習評価画面 -->
+        <div id="stepRatingView" class="quiz-step-view" style="display:none;">
+          <div class="step-rating-body">
+            <div class="rating-prompt-card">
+              <div id="ratingPromptIcon" class="rating-prompt-icon">👍</div>
+              <div id="ratingPromptTitle" class="rating-prompt-title">記憶の定着度を選択してください</div>
+              <div id="ratingPromptSub" class="rating-prompt-sub">
+                判定に応じた推奨評価がハイライトされています。<kbd>Space</kbd> で推奨評価を適用して次へ進みます。
+              </div>
+            </div>
+
+            <div class="rating-big-grid">
+              <button type="button" class="anki-btn again" data-rating="again">
+                <span class="anki-title">Again</span>
+                <span class="anki-interval" id="ivAgain">再出題 (&lt;1分)</span>
+                <span class="anki-key">[1] もう一度</span>
+              </button>
+              <button type="button" class="anki-btn hard" data-rating="hard">
+                <span class="anki-title">Hard</span>
+                <span class="anki-interval" id="ivHard">6時間</span>
+                <span class="anki-key">[2] 難しい</span>
+              </button>
+              <button type="button" class="anki-btn good" data-rating="good">
+                <span class="anki-title">Good</span>
+                <span class="anki-interval" id="ivGood">1日</span>
+                <span class="anki-key">[3] 普通</span>
+              </button>
+              <button type="button" class="anki-btn easy" data-rating="easy">
+                <span class="anki-title">Easy</span>
+                <span class="anki-interval" id="ivEasy">4日</span>
+                <span class="anki-key">[4] 簡単</span>
+              </button>
+            </div>
+
+            <div style="margin-top:14px;">
+              <button type="button" id="btnBackToExplanation" class="btn-ghost" style="font-size:0.84rem;padding:6px 14px;">
+                👈 もう一度解説を見る
+              </button>
             </div>
           </div>
         </div>
@@ -3149,10 +3479,9 @@
         extImg.src = q.imageUrl;
       }
 
-      // 結果パネル・凡例初期化
+      // 3ステップ初期化: ステップ1（問題画面）へリセット
+      setQuizStep("question");
       document.getElementById("diffLegend").classList.remove("visible");
-      document.getElementById("resultPanel").classList.remove("visible");
-      document.getElementById("submitBar").style.display = "flex";
 
       // 回答入力UIの切替
       const typeAContainer = document.getElementById("typeAContainer");
@@ -3327,6 +3656,72 @@
       });
     }
 
+    
+    /* =========================================================================
+     * 5.5 スクロール不要 3ステップUI制御（問題 ➔ 解説 ➔ 推奨評価）
+     * ========================================================================= */
+    function setQuizStep(step) {
+      const stepQ = document.getElementById("stepQuestionView");
+      const stepE = document.getElementById("stepExplanationView");
+      const stepR = document.getElementById("stepRatingView");
+      const indicator = document.getElementById("quizStepIndicator");
+
+      if (step === "question") {
+        quizPhase = "answering";
+        stepQ.style.display = "flex";
+        stepE.style.display = "none";
+        stepR.style.display = "none";
+        indicator.textContent = "1/3 問題";
+        const scrollArea = stepQ.querySelector(".step-question-scroll");
+        if (scrollArea) scrollArea.scrollTop = 0;
+      } else if (step === "explanation") {
+        quizPhase = "explanation";
+        stepQ.style.display = "none";
+        stepE.style.display = "flex";
+        stepR.style.display = "none";
+        indicator.textContent = "2/3 正解・解説";
+        const scrollArea = stepE.querySelector(".step-explanation-body");
+        if (scrollArea) scrollArea.scrollTop = 0;
+      } else if (step === "rating") {
+        quizPhase = "rating";
+        stepQ.style.display = "none";
+        stepE.style.display = "none";
+        stepR.style.display = "flex";
+        indicator.textContent = "3/3 復習評価";
+
+        // 推奨評価ハイライトとプロンプト文言の更新
+        const isCorrect = lastIsCorrect;
+        const iconEl = document.getElementById("ratingPromptIcon");
+        const titleEl = document.getElementById("ratingPromptTitle");
+        const subEl = document.getElementById("ratingPromptSub");
+
+        if (isCorrect) {
+          iconEl.textContent = "🎉";
+          titleEl.textContent = "ナイス正解！定着度を選択してください";
+          subEl.innerHTML = "推奨評価 <strong>[Good]</strong> がハイライトされています。<kbd>Space</kbd> で選択して次の問題へ進みます。";
+        } else {
+          iconEl.textContent = "💡";
+          titleEl.textContent = "惜しい！再学習間隔を選択してください";
+          subEl.innerHTML = "推奨評価 <strong>[Again]</strong> がハイライトされています。<kbd>Space</kbd> で選択して復習キューに入れます。";
+        }
+
+        const recommendedRating = isCorrect ? "good" : "again";
+        document.querySelectorAll("#stepRatingView .anki-btn").forEach((btn) => {
+          btn.classList.toggle("recommended-anki", btn.dataset.rating === recommendedRating);
+        });
+      }
+    }
+
+    function proceedToRating() {
+      if (quizPhase !== "explanation") return;
+      setQuizStep("rating");
+    }
+
+    function backToExplanation() {
+      if (quizPhase !== "rating") return;
+      setQuizStep("explanation");
+    }
+
     /* =========================================================================
      * 6. 回答判定（完全一致チェック・過不足可視化）＆ Anki復習度評価
      * ========================================================================= */
@@ -3374,9 +3769,6 @@
         renderTypeAPowerGrid();
       }
 
-      // 送信ボタンを隠し、結果＆解説・Ankiボタンを表示
-      document.getElementById("submitBar").style.display = "none";
-
       const banner = document.getElementById("resultBanner");
       banner.className = "result-banner " + (isCorrect ? "correct" : "incorrect");
 
@@ -3401,26 +3793,21 @@
       // 解説テキスト
       document.getElementById("explanationText").textContent = q.explanation;
 
-      // Anki次回間隔ラベル計算と推奨ハイライト
+      // Anki次回間隔ラベル計算
       const schedules = computeNextSchedules(rec);
       document.getElementById("ivAgain").textContent = formatInterval(schedules.again);
       document.getElementById("ivHard").textContent = formatInterval(schedules.hard);
       document.getElementById("ivGood").textContent = formatInterval(schedules.good);
       document.getElementById("ivEasy").textContent = formatInterval(schedules.easy);
 
-      const recommendedRating = isCorrect ? "good" : "again";
-      document.querySelectorAll(".anki-btn").forEach((btn) => {
-        btn.classList.toggle("recommended", btn.dataset.rating === recommendedRating);
-      });
-
-      const resultPanel = document.getElementById("resultPanel");
-      resultPanel.classList.add("visible");
+      // ステップ2（解説画面）に切り替え
+      setQuizStep("explanation");
 
       updateDashboardStats();
     }
 
     function applyAnkiRating(rating) {
-      if (!currentQuestion || quizPhase !== "reviewed") return;
+      if (!currentQuestion || (quizPhase !== "rating" && quizPhase !== "explanation")) return;
 
       const q = currentQuestion;
       const rec = getCardRecord(q.id);
@@ -3565,6 +3952,12 @@
     function setupEventListeners() {
       // 回答ボタン
       document.getElementById("btnSubmitAnswer").addEventListener("click", submitAnswer);
+
+      // ステップ2 ➔ ステップ3 への進むボタン
+      document.getElementById("btnProceedToRating").addEventListener("click", proceedToRating);
+
+      // ステップ3 ➔ ステップ2 への戻るボタン
+      document.getElementById("btnBackToExplanation").addEventListener("click", backToExplanation);
 
       // Anki 4段階評価ボタン
       document.querySelectorAll(".anki-btn").forEach((btn) => {
@@ -3851,13 +4244,16 @@
           e.preventDefault();
           if (quizPhase === "answering") {
             submitAnswer();
-          } else if (quizPhase === "reviewed") {
+          } else if (quizPhase === "explanation") {
+            proceedToRating();
+          } else if (quizPhase === "rating") {
             applyAnkiRating(lastIsCorrect ? "good" : "again");
           }
           return;
         }
 
-        if (quizPhase === "reviewed") {
+        // 評価画面または解説画面での数字キーによる直接評価適用
+        if (quizPhase === "rating" || quizPhase === "explanation") {
           if (e.key === "1") {
             e.preventDefault();
             applyAnkiRating("again");
@@ -3870,6 +4266,9 @@
           } else if (e.key === "4") {
             e.preventDefault();
             applyAnkiRating("easy");
+          } else if (quizPhase === "rating" && (e.key === "Backspace" || e.key === "ArrowLeft")) {
+            e.preventDefault();
+            backToExplanation();
           }
         }
       });

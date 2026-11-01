@@ -1287,6 +1287,344 @@
   box-shadow: none;
 }
 
+/* =========================================================================
+ * 10. スマホ版（モバイル）最適化スタイル
+ * ========================================================================= */
+
+/* モバイル用ハンバーガーボタン（デフォルト非表示、スマホで表示） */
+.mobile-nav-toggle {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 6px 11px;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-toggle:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+}
+
+/* スマホ用ドロワーメニュー（右スライドイン） */
+.mobile-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.mobile-drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(84vw, 340px);
+  background: #0f172a;
+  border-left: 1px solid var(--border);
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.6);
+  z-index: 101;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.drawer-title {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.drawer-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.drawer-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-sub);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.drawer-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawer-btn {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.drawer-btn:hover, .drawer-btn:active {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+}
+
+.drawer-mode-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* スマホ表示時のメディアクエリ（768px以下） */
+@media (max-width: 768px) {
+  /* ヘッダー全体をわずか一行（高さ約52px）に圧縮 */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .header-inner {
+    padding: 8px 12px;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+    border-radius: 8px;
+  }
+
+  .brand-title {
+    font-size: 0.98rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+  }
+
+  .brand-sub {
+    display: none !important;
+  }
+
+  /* PC用キーボード案内と通常コントロールをヘッダーから隠す */
+  .kbd-hint {
+    display: none !important;
+  }
+
+  .header-controls .mode-select,
+  .header-controls #btnOpenDataModal,
+  .header-controls #btnResetProgress {
+    display: none !important;
+  }
+
+  /* 「学習項目を変更」ボタンは短縮してヘッダーに配置 */
+  #btnChangeCategories {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  /* ハンバーガーボタンを表示 */
+  .mobile-nav-toggle {
+    display: inline-flex !important;
+  }
+
+  /* メイン余白の削減 */
+  .main-container {
+    padding: 10px 8px 24px 8px;
+    gap: 14px;
+  }
+
+  .quiz-panel {
+    border-radius: 12px;
+  }
+
+  .quiz-topbar {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .quiz-body {
+    padding: 14px 12px;
+  }
+
+  .question-title {
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    line-height: 1.45;
+  }
+
+  /* 画像ステージの高さ制限（画面を占拠しないよう 38vh に） */
+  .visual-stage {
+    min-height: 180px;
+    max-height: 38vh;
+    margin-bottom: 14px;
+  }
+
+  /* 回答説明テキストとツールバー */
+  .answer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .answer-quick-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* 電力会社ボタンの押しやすさ向上（2列） */
+  .power-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .power-btn {
+    padding: 11px 8px;
+    font-size: 0.88rem;
+    min-height: 48px;
+    justify-content: center;
+  }
+
+  /* 都道府県アコーディオン */
+  .region-accordion {
+    margin-bottom: 8px;
+  }
+
+  .region-header {
+    padding: 10px 12px;
+  }
+
+  .region-body {
+    padding: 10px 8px;
+  }
+
+  .pref-badges {
+    gap: 6px;
+  }
+
+  .pref-badge {
+    padding: 7px 10px;
+    font-size: 0.82rem;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* 送信ボタンのタップしやすさ */
+  .btn-submit {
+    padding: 13px;
+    font-size: 0.98rem;
+    border-radius: 10px;
+  }
+
+  /* 結果パネル */
+  .result-banner {
+    padding: 12px 14px;
+  }
+
+  .result-verdict {
+    font-size: 1.15rem;
+  }
+
+  .anki-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .anki-btn {
+    padding: 10px 6px;
+    min-height: 52px;
+  }
+
+  .anki-title {
+    font-size: 0.88rem;
+  }
+
+  .anki-interval {
+    font-size: 0.72rem;
+  }
+
+  /* スタート画面のモバイル最適化 */
+  .start-panel {
+    padding: 20px 14px;
+  }
+
+  .start-title {
+    font-size: 1.15rem;
+  }
+
+  .cat-select-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .cat-select-card {
+    padding: 12px 14px;
+  }
+
+  .btn-start-study {
+    width: 100%;
+    padding: 13px 20px;
+    font-size: 0.96rem;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -1301,6 +1639,7 @@
       </div>
 
       <div class="header-controls">
+        <button type="button" id="btnToggleMobileMenu" class="mobile-nav-toggle" aria-label="メニューを開く">☰</button>
         <span class="kbd-hint" title="キーボードショートカット">
           <kbd>Space</kbd>/<kbd>Enter</kbd> 判定・次へ
           <kbd>1</kbd>〜<kbd>4</kbd> 復習評価
@@ -1316,6 +1655,53 @@
       </div>
     </div>
   </header>
+  <!-- Mobile Drawer Menu -->
+  <div id="mobileDrawerBackdrop" class="mobile-drawer-backdrop" aria-hidden="true"></div>
+  <aside id="mobileDrawer" class="mobile-drawer" aria-label="モバイルメニュー" aria-hidden="true">
+    <div class="drawer-header">
+      <span class="drawer-title">メニュー & 設定</span>
+      <button type="button" id="btnCloseMobileDrawer" class="btn-ghost" style="padding:4px 9px;font-size:1.05rem;" aria-label="閉じる">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div>
+        <div class="drawer-section-title">学習メニュー</div>
+        <div class="drawer-btn-group">
+          <button type="button" id="btnDrawerChangeCats" class="drawer-btn" style="border-color:var(--accent);color:#7dd3fc;">
+            <span>📚</span>
+            <span>学習項目を選択・変更</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="drawer-section-title">出題モード切替</div>
+        <select id="drawerStudyModeSelect" class="drawer-mode-select" aria-label="出題モード切替（モバイル）">
+          <option value="due">通常学習（期限到来＋新規優先）</option>
+          <option value="all">全問演習（シャッフル一巡）</option>
+          <option value="weak">苦手特訓（誤答・Again履歴優先）</option>
+        </select>
+      </div>
+
+      <div>
+        <div class="drawer-section-title">データ & 進捗</div>
+        <div class="drawer-btn-group">
+          <button type="button" id="btnDrawerOpenDataModal" class="drawer-btn">
+            <span>⚙️</span>
+            <span>問題データJSON管理</span>
+          </button>
+          <button type="button" id="btnDrawerResetProgress" class="drawer-btn" style="color:#f87171;">
+            <span>🔄</span>
+            <span>学習進捗をリセット</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-top:auto;padding-top:14px;border-top:1px solid var(--border-subtle);font-size:0.75rem;color:var(--text-sub);line-height:1.5;">
+        出典: <a href="https://geopinning.space/rule/asia/japan/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GeoGuessrの攻略めも (geopinning.space)</a>
+      </div>
+    </div>
+  </aside>
+
 
   <main class="main-container">
     <!-- Main Quiz Column -->
@@ -3282,6 +3668,82 @@
 
       
       // 学習項目選択関連
+      
+      // モバイルドロワー開閉制御
+      const drawer = document.getElementById("mobileDrawer");
+      const drawerBackdrop = document.getElementById("mobileDrawerBackdrop");
+      const btnToggleMenu = document.getElementById("btnToggleMobileMenu");
+      const btnCloseDrawer = document.getElementById("btnCloseMobileDrawer");
+
+      function openMobileDrawer() {
+        if (!drawer) return;
+        drawer.classList.add("open");
+        drawerBackdrop.classList.add("open");
+        drawer.setAttribute("aria-hidden", "false");
+        drawerBackdrop.setAttribute("aria-hidden", "false");
+        // モード選択の値をPCセレクトと同期
+        const drawerSelect = document.getElementById("drawerStudyModeSelect");
+        if (drawerSelect) drawerSelect.value = studyMode;
+      }
+
+      function closeMobileDrawer() {
+        if (!drawer) return;
+        drawer.classList.remove("open");
+        drawerBackdrop.classList.remove("open");
+        drawer.setAttribute("aria-hidden", "true");
+        drawerBackdrop.setAttribute("aria-hidden", "true");
+      }
+
+      if (btnToggleMenu) btnToggleMenu.addEventListener("click", openMobileDrawer);
+      if (btnCloseDrawer) btnCloseDrawer.addEventListener("click", closeMobileDrawer);
+      if (drawerBackdrop) drawerBackdrop.addEventListener("click", closeMobileDrawer);
+
+      // ドロワー内の「学習項目を変更」ボタン
+      const btnDrawerCats = document.getElementById("btnDrawerChangeCats");
+      if (btnDrawerCats) {
+        btnDrawerCats.addEventListener("click", () => {
+          closeMobileDrawer();
+          showCategorySelectScreen();
+        });
+      }
+
+      // ドロワー内のモード切替
+      const drawerModeSelect = document.getElementById("drawerStudyModeSelect");
+      if (drawerModeSelect) {
+        drawerModeSelect.addEventListener("change", () => {
+          studyMode = drawerModeSelect.value;
+          const pcModeSelect = document.getElementById("studyModeSelect");
+          if (pcModeSelect) pcModeSelect.value = studyMode;
+          closeMobileDrawer();
+          buildStudyQueue();
+          loadNextQuestion();
+        });
+      }
+
+      // ドロワー内のデータJSONボタン
+      const btnDrawerData = document.getElementById("btnDrawerOpenDataModal");
+      if (btnDrawerData) {
+        btnDrawerData.addEventListener("click", () => {
+          closeMobileDrawer();
+          const jsonEditor = document.getElementById("jsonEditorArea");
+          const dataModal = document.getElementById("dataModal");
+          if (jsonEditor && dataModal) {
+            jsonEditor.value = JSON.stringify(questionsPool, null, 2);
+            dataModal.classList.add("open");
+          }
+        });
+      }
+
+      // ドロワー内の進捗リセットボタン
+      const btnDrawerReset = document.getElementById("btnDrawerResetProgress");
+      if (btnDrawerReset) {
+        btnDrawerReset.addEventListener("click", () => {
+          closeMobileDrawer();
+          const btnPcReset = document.getElementById("btnResetProgress");
+          if (btnPcReset) btnPcReset.click();
+        });
+      }
+
       const btnChangeCats = document.getElementById("btnChangeCategories");
       if (btnChangeCats) {
         btnChangeCats.addEventListener("click", () => showCategorySelectScreen());

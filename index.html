@@ -2112,6 +2112,286 @@
   }
 }
 
+  
+/* =========================================================================
+ * 12. 4画面完全排他 & 全画角（iPhone / iPad / Duo / PC）マルチ適応スタイル
+ * ========================================================================= */
+
+/* 画面共通の基底クラス */
+.app-screen {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* 非表示画面は絶対消去 */
+.app-screen.hidden {
+  display: none !important;
+}
+
+/* スクロール可能中央ボディ（画像や選択肢） */
+.screen-scroll-body {
+  flex: 1 1 0px !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+/* 下部固定フッター（主操作ボタン） */
+.screen-footer {
+  flex-shrink: 0 !important;
+  padding: 8px 12px max(8px, env(safe-area-inset-bottom)) 12px !important;
+  background: rgba(15, 23, 42, 0.96) !important;
+  border-top: 1px solid var(--border-subtle) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  z-index: 20 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* メインコンテナのアダプティブ制御（全画角適応） */
+.main-container {
+  height: calc(100dvh - 50px) !important;
+  max-width: 640px !important; /* iPad・PCでも間延びせずスマホアプリ比率を維持 */
+  margin: 0 auto !important;
+  padding: 4px 6px max(4px, env(safe-area-inset-bottom)) 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.quiz-panel {
+  flex: 1 1 0px !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 12px !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-sizing: border-box !important;
+}
+
+/* 画面①: 学習項目選択画面 */
+#screenCatSelect .screen-header {
+  padding: 10px 12px 6px 12px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+#screenCatSelect .start-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+#screenCatSelect .start-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 8px 12px;
+  flex-shrink: 0;
+}
+
+#screenCatSelect .screen-scroll-body {
+  padding: 4px 10px;
+  gap: 5px;
+}
+
+#screenCatSelect .cat-select-card {
+  padding: 8px 12px;
+  min-height: 42px;
+  border-radius: 8px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* 画面②: 問題画面 */
+#screenQuestion .quiz-topbar,
+#screenExplanation .quiz-topbar,
+#screenRating .quiz-topbar {
+  padding: 7px 10px;
+  flex-shrink: 0;
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#screenQuestion .screen-scroll-body {
+  padding: 10px 10px 6px 10px;
+  gap: 8px;
+}
+
+#screenQuestion .question-title {
+  font-size: 0.98rem;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+/* ビジュアルステージ: 画面の高さに応じて流動的に伸縮（高さを占拠しない） */
+.visual-stage {
+  height: clamp(120px, 24vh, 220px) !important;
+  min-height: 120px !important;
+  max-height: 220px !important;
+  margin-bottom: 6px !important;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #020617;
+  border: 1px solid var(--border-subtle);
+}
+
+.visual-stage img, .visual-stage svg {
+  max-height: 100% !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+}
+
+/* 回答ヘッダー */
+.answer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 6px;
+}
+
+.answer-instruction {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+/* 電力会社ボタングリッド */
+.power-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.power-btn {
+  padding: 8px 6px;
+  min-height: 42px;
+  font-size: 0.84rem;
+  border-radius: 6px;
+}
+
+/* 画面③: 正解・解説画面 */
+#screenExplanation .screen-scroll-body {
+  padding: 12px 10px;
+  gap: 12px;
+}
+
+#screenExplanation .result-banner {
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+#screenExplanation .result-verdict {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+/* 画面④: 復習評価画面 */
+#screenRating .screen-scroll-body {
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+#screenRating .rating-prompt-card {
+  text-align: center;
+  max-width: 500px;
+}
+
+#screenRating .rating-prompt-icon {
+  font-size: 2.2rem;
+  margin-bottom: 4px;
+}
+
+#screenRating .rating-prompt-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+#screenRating .rating-prompt-sub {
+  font-size: 0.82rem;
+  color: var(--text-sub);
+}
+
+#screenRating .rating-big-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 480px;
+}
+
+#screenRating .anki-btn {
+  padding: 14px 8px;
+  min-height: 78px;
+  border-radius: 8px;
+}
+
+#screenRating .anki-title {
+  font-size: 1.05rem;
+}
+
+#screenRating .anki-interval {
+  font-size: 0.82rem;
+}
+
+/* ヘッダーの完全1行固定 */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 46px;
+}
+
+.header-inner {
+  height: 100%;
+  padding: 4px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.brand-title {
+  font-size: 0.95rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 180px !important;
+}
+
+/* デスクトップ・タブレット大画面時のサイドバー非表示 */
+aside.sidebar {
+  display: none !important;
+}
+
   </style>
 </head>
 <body>
@@ -2193,11 +2473,13 @@
   <main class="main-container">
     <!-- Main Quiz Column -->
     <section class="quiz-panel" aria-live="polite">
-      <!-- Category Selection Start Screen -->
-      <div id="categorySelectScreen" class="start-panel" style="display:flex;">
-        <div class="start-header">
+
+      <!-- ===================================================================
+           画面①: 学習項目選択画面 (screenCatSelect)
+           =================================================================== -->
+      <div id="screenCatSelect" class="app-screen">
+        <div class="screen-header">
           <div class="start-title">🎯 学習する視覚メタ項目を選択</div>
-          <div class="start-desc">集中して覚えたい項目を選択して「学習を開始」を押してください（複数選択・1項目のみどちらも可能）。</div>
         </div>
 
         <div class="start-tools">
@@ -2209,146 +2491,166 @@
           <button type="button" id="btnStartStudyTop" class="btn-start-study-top">🚀 学習を開始</button>
         </div>
 
-        <div id="catSelectGrid" class="cat-select-grid"></div>
+        <div id="catSelectGrid" class="screen-scroll-body"></div>
 
-        <div class="start-footer">
+        <div class="screen-footer">
           <button type="button" id="btnStartStudySession" class="btn-start-study">🚀 選択した項目で学習を開始</button>
         </div>
       </div>
 
-      <div id="quizActiveView">
+      <!-- ===================================================================
+           画面②: 問題・回答画面 (screenQuestion)
+           =================================================================== -->
+      <div id="screenQuestion" class="app-screen hidden">
         <div class="quiz-topbar">
           <div class="badge-group">
             <span id="qCategoryBadge" class="cat-badge">カテゴリ</span>
-            <span id="qTypeBadge" class="type-badge">回答形式</span>
+            <span id="qTypeBadge" class="type-badge">形式</span>
           </div>
           <div class="badge-group">
-            <span id="quizStepIndicator" class="step-badge">1/3 問題</span>
+            <span class="step-badge">1/3 問題</span>
             <span id="qIdBadge" class="srs-badge">#ID</span>
-            <span id="qSrsBadge" class="srs-badge">新規カード</span>
+            <span id="qSrsBadge" class="srs-badge">新規</span>
           </div>
         </div>
 
-        <!-- ステップ1: 問題・回答画面 -->
-        <div id="stepQuestionView" class="quiz-step-view">
-          <div class="step-question-scroll">
-            <h1 id="qQuestionText" class="question-title">読み込み中...</h1>
+        <div class="screen-scroll-body">
+          <h1 id="qQuestionText" class="question-title">読み込み中...</h1>
 
-            <div class="visual-stage" id="visualStage">
-              <div id="svgFallbackContainer" style="width:100%;"></div>
-              <img id="externalQuestionImg" class="external-photo" alt="出題メタ画像" />
-              <div class="visual-tools">
-                <button type="button" id="btnToggleVisualSource" class="visual-tool-btn" style="display:none;">SVG図解切替</button>
-                <button type="button" id="btnZoomVisual" class="visual-tool-btn">🔍 拡大表示</button>
-              </div>
+          <div class="visual-stage" id="visualStage">
+            <div id="svgFallbackContainer" style="width:100%;"></div>
+            <img id="externalQuestionImg" class="external-photo" alt="出題メタ画像" />
+            <div class="visual-tools">
+              <button type="button" id="btnToggleVisualSource" class="visual-tool-btn" style="display:none;">SVG図解切替</button>
+              <button type="button" id="btnZoomVisual" class="visual-tool-btn">🔍 拡大表示</button>
             </div>
-
-            <!-- Answer Header -->
-            <div class="answer-header">
-              <div id="answerInstruction" class="answer-instruction">該当する選択肢を選んでください</div>
-              <div class="answer-quick-actions" id="prefQuickTools" style="display:none;">
-                <span id="prefSelectedCounter" class="selection-counter">選択中: 0</span>
-                <button type="button" id="btnExpandAllRegions" class="btn-ghost" style="padding:4px 9px;font-size:0.75rem;">全地方 開閉</button>
-                <button type="button" id="btnClearPrefSelection" class="btn-ghost" style="padding:4px 9px;font-size:0.75rem;">選択クリア</button>
-              </div>
-            </div>
-
-            <!-- Dynamic Input Area -->
-            <div id="typeAContainer" class="power-grid" style="display:none;"></div>
-            <div id="typeBContainer" class="regions-wrapper" style="display:none;"></div>
           </div>
 
-          <!-- Submit Button Fixed Footer -->
-          <div id="submitBar" class="step-footer-bar">
-            <button type="button" id="btnSubmitAnswer" class="btn-submit">
-              <span>回答する</span>
-              <kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>
+          <div class="answer-header">
+            <div id="answerInstruction" class="answer-instruction">該当する選択肢を選んでください</div>
+            <div class="answer-quick-actions" id="prefQuickTools" style="display:none;">
+              <span id="prefSelectedCounter" class="selection-counter">選択中: 0</span>
+              <button type="button" id="btnExpandAllRegions" class="btn-ghost" style="padding:3px 8px;font-size:0.72rem;">全地方 開閉</button>
+              <button type="button" id="btnClearPrefSelection" class="btn-ghost" style="padding:3px 8px;font-size:0.72rem;">クリア</button>
+            </div>
+          </div>
+
+          <div id="typeAContainer" class="power-grid" style="display:none;"></div>
+          <div id="typeBContainer" class="regions-wrapper" style="display:none;"></div>
+        </div>
+
+        <div class="screen-footer">
+          <button type="button" id="btnSubmitAnswer" class="btn-submit">
+            <span>回答する</span>
+            <kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           画面③: 正解と解説画面 (screenExplanation)
+           =================================================================== -->
+      <div id="screenExplanation" class="app-screen hidden">
+        <div class="quiz-topbar">
+          <div class="badge-group">
+            <span id="qCategoryBadgeExp" class="cat-badge">カテゴリ</span>
+          </div>
+          <div class="badge-group">
+            <span class="step-badge">2/3 正解・解説</span>
+            <span id="qIdBadgeExp" class="srs-badge">#ID</span>
+          </div>
+        </div>
+
+        <div class="screen-scroll-body">
+          <div id="resultBanner" class="result-banner">
+            <div id="resultVerdict" class="result-verdict"></div>
+            <div id="resultSummarySub" style="font-size:0.82rem;"></div>
+          </div>
+
+          <div id="diffLegend" class="diff-legend">
+            <span style="font-weight:700;color:var(--text-sub);">判定内訳:</span>
+            <span class="legend-item"><span class="legend-swatch swatch-hit"></span>緑：正解（一致）</span>
+            <span class="legend-item"><span class="legend-swatch swatch-extra"></span>赤：誤答（過剰選択）</span>
+            <span class="legend-item"><span class="legend-swatch swatch-missed"></span>黄枠：見落とし（不足選択）</span>
+          </div>
+
+          <div class="correct-answer-box">
+            <div class="box-label">正解データ</div>
+            <div id="correctAnswerPills" class="correct-pills"></div>
+          </div>
+
+          <div class="explanation-box">
+            <div class="box-label" style="color:var(--accent);">解説・着眼点（メタの特徴）</div>
+            <div id="explanationText"></div>
+            <div style="margin-top:8px;font-size:0.75rem;color:var(--text-sub);">
+              出典: <a href="https://geopinning.space/rule/asia/japan/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GeoGuessrの攻略めも (geopinning.space)</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-footer">
+          <button type="button" id="btnProceedToRating" class="btn-proceed">
+            <span>復習評価へ進む 👉</span>
+            <kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           画面④: 復習度評価画面 (screenRating)
+           =================================================================== -->
+      <div id="screenRating" class="app-screen hidden">
+        <div class="quiz-topbar">
+          <div class="badge-group">
+            <span id="qCategoryBadgeRate" class="cat-badge">カテゴリ</span>
+          </div>
+          <div class="badge-group">
+            <span class="step-badge">3/3 復習評価</span>
+            <span id="qIdBadgeRate" class="srs-badge">#ID</span>
+          </div>
+        </div>
+
+        <div class="screen-scroll-body">
+          <div class="rating-prompt-card">
+            <div id="ratingPromptIcon" class="rating-prompt-icon">👍</div>
+            <div id="ratingPromptTitle" class="rating-prompt-title">記憶の定着度を選択してください</div>
+            <div id="ratingPromptSub" class="rating-prompt-sub">
+              判定に応じた推奨評価がハイライトされています。<kbd>Space</kbd> で推奨評価を適用して次へ進みます。
+            </div>
+          </div>
+
+          <div class="rating-big-grid">
+            <button type="button" class="anki-btn again" data-rating="again">
+              <span class="anki-title">Again</span>
+              <span class="anki-interval" id="ivAgain">再出題 (&lt;1分)</span>
+              <span class="anki-key">[1] もう一度</span>
+            </button>
+            <button type="button" class="anki-btn hard" data-rating="hard">
+              <span class="anki-title">Hard</span>
+              <span class="anki-interval" id="ivHard">6時間</span>
+              <span class="anki-key">[2] 難しい</span>
+            </button>
+            <button type="button" class="anki-btn good" data-rating="good">
+              <span class="anki-title">Good</span>
+              <span class="anki-interval" id="ivGood">1日</span>
+              <span class="anki-key">[3] 普通</span>
+            </button>
+            <button type="button" class="anki-btn easy" data-rating="easy">
+              <span class="anki-title">Easy</span>
+              <span class="anki-interval" id="ivEasy">4日</span>
+              <span class="anki-key">[4] 簡単</span>
             </button>
           </div>
-        </div>
 
-        <!-- ステップ2: 正解と解説画面 -->
-        <div id="stepExplanationView" class="quiz-step-view" style="display:none;">
-          <div class="step-explanation-body">
-            <div id="resultBanner" class="result-banner">
-              <div id="resultVerdict" class="result-verdict"></div>
-              <div id="resultSummarySub" style="font-size:0.82rem;"></div>
-            </div>
-
-            <!-- Diff Legend for Prefecture Grading -->
-            <div id="diffLegend" class="diff-legend">
-              <span style="font-weight:700;color:var(--text-sub);">判定内訳:</span>
-              <span class="legend-item"><span class="legend-swatch swatch-hit"></span>緑：正解（一致）</span>
-              <span class="legend-item"><span class="legend-swatch swatch-extra"></span>赤：誤答（過剰選択）</span>
-              <span class="legend-item"><span class="legend-swatch swatch-missed"></span>黄枠：見落とし（不足選択）</span>
-            </div>
-
-            <div class="correct-answer-box">
-              <div class="box-label">正解データ</div>
-              <div id="correctAnswerPills" class="correct-pills"></div>
-            </div>
-
-            <div class="explanation-box">
-              <div class="box-label" style="color:var(--accent);">解説・着眼点（メタの特徴）</div>
-              <div id="explanationText"></div>
-              <div style="margin-top:8px;font-size:0.76rem;color:var(--text-sub);">
-                出典: <a href="https://geopinning.space/rule/asia/japan/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GeoGuessrの攻略めも (geopinning.space)</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="step-footer-bar">
-            <button type="button" id="btnProceedToRating" class="btn-proceed">
-              <span>復習評価へ進む 👉</span>
-              <kbd style="background:rgba(15,23,42,0.45);color:#e0f2fe;border-color:rgba(255,255,255,0.3);">Space / Enter</kbd>
+          <div style="margin-top:12px;">
+            <button type="button" id="btnBackToExplanation" class="btn-ghost" style="font-size:0.84rem;padding:6px 14px;">
+              👈 もう一度解説を見る
             </button>
-          </div>
-        </div>
-
-        <!-- ステップ3: 復習評価画面 -->
-        <div id="stepRatingView" class="quiz-step-view" style="display:none;">
-          <div class="step-rating-body">
-            <div class="rating-prompt-card">
-              <div id="ratingPromptIcon" class="rating-prompt-icon">👍</div>
-              <div id="ratingPromptTitle" class="rating-prompt-title">記憶の定着度を選択してください</div>
-              <div id="ratingPromptSub" class="rating-prompt-sub">
-                判定に応じた推奨評価がハイライトされています。<kbd>Space</kbd> で推奨評価を適用して次へ進みます。
-              </div>
-            </div>
-
-            <div class="rating-big-grid">
-              <button type="button" class="anki-btn again" data-rating="again">
-                <span class="anki-title">Again</span>
-                <span class="anki-interval" id="ivAgain">再出題 (&lt;1分)</span>
-                <span class="anki-key">[1] もう一度</span>
-              </button>
-              <button type="button" class="anki-btn hard" data-rating="hard">
-                <span class="anki-title">Hard</span>
-                <span class="anki-interval" id="ivHard">6時間</span>
-                <span class="anki-key">[2] 難しい</span>
-              </button>
-              <button type="button" class="anki-btn good" data-rating="good">
-                <span class="anki-title">Good</span>
-                <span class="anki-interval" id="ivGood">1日</span>
-                <span class="anki-key">[3] 普通</span>
-              </button>
-              <button type="button" class="anki-btn easy" data-rating="easy">
-                <span class="anki-title">Easy</span>
-                <span class="anki-interval" id="ivEasy">4日</span>
-                <span class="anki-key">[4] 簡単</span>
-              </button>
-            </div>
-
-            <div style="margin-top:14px;">
-              <button type="button" id="btnBackToExplanation" class="btn-ghost" style="font-size:0.84rem;padding:6px 14px;">
-                👈 もう一度解説を見る
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- Queue Completed Screen -->
+<!-- Queue Completed Screen -->
       <div id="quizCompleteView" class="complete-state">
         <div class="complete-icon">🎯</div>
         <h2 style="font-size:1.35rem;margin-bottom:8px;">現在の学習キューを完了しました！</h2>
@@ -3579,8 +3881,7 @@
 
       if (studyQueue.length === 0) {
         currentQuestion = null;
-        activeView.style.display = "none";
-        completeView.classList.add("visible");
+        setActiveScreen("complete");
         clearFilterBtn.style.display = activeCategoryFilter ? "inline-flex" : "none";
 
         const msgEl = document.getElementById("completeMessage");
@@ -3847,37 +4148,75 @@
     }
 
     
+    
     /* =========================================================================
-     * 5.5 スクロール不要 3ステップUI制御（問題 ➔ 解説 ➔ 推奨評価）
+     * 5.5 4画面完全排他コントローラー（範囲選択 ➔ 問題 ➔ 解説 ➔ 復習評価）
      * ========================================================================= */
-    function setQuizStep(step) {
-      const stepQ = document.getElementById("stepQuestionView");
-      const stepE = document.getElementById("stepExplanationView");
-      const stepR = document.getElementById("stepRatingView");
-      const indicator = document.getElementById("quizStepIndicator");
+    function setActiveScreen(name) {
+      const screens = {
+        cat_select: document.getElementById("screenCatSelect"),
+        question: document.getElementById("screenQuestion"),
+        explanation: document.getElementById("screenExplanation"),
+        rating: document.getElementById("screenRating"),
+        complete: document.getElementById("quizCompleteView")
+      };
 
+      Object.entries(screens).forEach(([key, el]) => {
+        if (!el) return;
+        if (key === name) {
+          el.classList.remove("hidden");
+        } else {
+          el.classList.add("hidden");
+        }
+      });
+
+      // スクロール位置を常にトップにリセット
+      const activeEl = screens[name];
+      if (activeEl) {
+        const scrollBox = activeEl.querySelector(".screen-scroll-body");
+        if (scrollBox) scrollBox.scrollTop = 0;
+      }
+    }
+
+    function showCategorySelectScreen() {
+      setActiveScreen("cat_select");
+      renderCategorySelectGrid();
+    }
+
+    function startStudyWithSelectedCategories() {
+      if (selectedCategories.size === 0) {
+        showToast("⚠️ 学習項目を1つ以上選択してください");
+        return;
+      }
+      saveSelectedCategories();
+      activeCategoryFilter = null;
+      buildStudyQueue();
+      loadNextQuestion();
+    }
+
+    function setQuizStep(step) {
       if (step === "question") {
         quizPhase = "answering";
-        stepQ.style.display = "flex";
-        stepE.style.display = "none";
-        stepR.style.display = "none";
-        indicator.textContent = "1/3 問題";
-        const scrollArea = stepQ.querySelector(".step-question-scroll");
-        if (scrollArea) scrollArea.scrollTop = 0;
+        setActiveScreen("question");
       } else if (step === "explanation") {
         quizPhase = "explanation";
-        stepQ.style.display = "none";
-        stepE.style.display = "flex";
-        stepR.style.display = "none";
-        indicator.textContent = "2/3 正解・解説";
-        const scrollArea = stepE.querySelector(".step-explanation-body");
-        if (scrollArea) scrollArea.scrollTop = 0;
+        // 解説画面ヘッダーバッジ同期
+        if (currentQuestion) {
+          const catEl = document.getElementById("qCategoryBadgeExp");
+          const idEl = document.getElementById("qIdBadgeExp");
+          if (catEl) catEl.textContent = currentQuestion.category;
+          if (idEl) idEl.textContent = "#" + currentQuestion.id;
+        }
+        setActiveScreen("explanation");
       } else if (step === "rating") {
         quizPhase = "rating";
-        stepQ.style.display = "none";
-        stepE.style.display = "none";
-        stepR.style.display = "flex";
-        indicator.textContent = "3/3 復習評価";
+        // 評価画面ヘッダーバッジ同期
+        if (currentQuestion) {
+          const catEl = document.getElementById("qCategoryBadgeRate");
+          const idEl = document.getElementById("qIdBadgeRate");
+          if (catEl) catEl.textContent = currentQuestion.category;
+          if (idEl) idEl.textContent = "#" + currentQuestion.id;
+        }
 
         // 推奨評価ハイライトとプロンプト文言の更新
         const isCorrect = lastIsCorrect;
@@ -3896,9 +4235,11 @@
         }
 
         const recommendedRating = isCorrect ? "good" : "again";
-        document.querySelectorAll("#stepRatingView .anki-btn").forEach((btn) => {
+        document.querySelectorAll("#screenRating .anki-btn").forEach((btn) => {
           btn.classList.toggle("recommended-anki", btn.dataset.rating === recommendedRating);
         });
+
+        setActiveScreen("rating");
       }
     }
 

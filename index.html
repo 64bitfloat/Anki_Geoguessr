@@ -1189,6 +1189,37 @@
   color: var(--text-sub);
 }
 
+
+.start-summary-pill {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.btn-start-study-top {
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(14, 165, 233, 0.35);
+  transition: all 0.16s ease;
+}
+
+.btn-start-study-top:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(14, 165, 233, 0.5);
+}
+
+.btn-start-study-top:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .start-tools {
   display: flex;
   justify-content: space-between;
@@ -1781,101 +1812,133 @@
 
   /* スタート画面（カテゴリ選択）の一画面・No-Scroll 最適化 */
   .start-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 10px 10px 8px 10px;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding: 8px 10px 8px 10px !important;
     border-radius: 10px;
+    box-sizing: border-box !important;
   }
 
   .start-header {
-    margin-bottom: 6px;
-    flex-shrink: 0;
+    margin-bottom: 4px !important;
+    flex-shrink: 0 !important;
+    text-align: center;
   }
 
   .start-title {
-    font-size: 1.05rem;
-    margin-bottom: 2px;
+    font-size: 0.98rem !important;
+    margin-bottom: 2px !important;
+    font-weight: 800;
   }
 
   .start-desc {
-    font-size: 0.72rem;
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: 0.7rem !important;
+    line-height: 1.25 !important;
+    display: none !important; /* スマホでは説明文を省略して表示領域を最大化 */
   }
 
   .start-tools {
-    margin-bottom: 6px;
-    flex-shrink: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 6px;
+    margin-bottom: 6px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 2px 0;
   }
 
-  .start-tools .btn-ghost {
-    padding: 4px 10px;
+  .start-summary-pill {
     font-size: 0.74rem;
-    border-radius: 6px;
+    font-weight: 700;
+    color: var(--accent);
+    padding: 2px 6px;
+    background: rgba(14, 165, 233, 0.12);
+    border-radius: 4px;
+    white-space: nowrap;
   }
 
-  #selectedCatSummary {
-    font-size: 0.75rem;
-    font-weight: 700;
+  /* 上部クイック開始ボタン */
+  .btn-start-study-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-start-study-top:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
   }
 
   .cat-select-grid {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 6px;
+    flex: 1 1 0px !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    margin-bottom: 6px !important;
     padding-right: 2px;
   }
 
   .cat-select-card {
-    padding: 6px 10px;
-    min-height: 42px;
-    border-radius: 8px;
-    gap: 8px;
-    flex-shrink: 0;
+    padding: 6px 9px !important;
+    min-height: 38px !important;
+    border-radius: 7px !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
   }
 
   .cat-select-checkbox {
-    width: 17px;
-    height: 17px;
+    width: 17px !important;
+    height: 17px !important;
   }
 
   .cat-select-name {
-    font-size: 0.84rem;
-    margin-bottom: 1px;
+    font-size: 0.82rem !important;
+    margin-bottom: 1px !important;
   }
 
   .cat-select-meta {
-    font-size: 0.68rem;
+    font-size: 0.67rem !important;
   }
 
+  /* 下部常時固定フッター（絶対に隠れない） */
   .start-footer {
-    flex-shrink: 0;
-    padding-top: 6px;
-    border-top: 1px solid var(--border-subtle);
-    width: 100%;
-    margin-top: auto;
+    flex-shrink: 0 !important;
+    padding: 8px 0 2px 0 !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    width: 100% !important;
+    margin-top: auto !important;
+    background: var(--bg-card);
+    z-index: 10;
   }
 
   .btn-start-study {
-    width: 100%;
-    padding: 11px;
-    font-size: 0.94rem;
-    font-weight: 800;
-    border-radius: 8px;
-    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 0.98rem !important;
+    font-weight: 800 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.45) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* ヘッダーの折り返し防止・スリム化（高さ約44px） */
@@ -1893,13 +1956,8 @@
     flex-shrink: 0 !important;
   }
 
-  /* スタート画面表示中はヘッダーの「学習項目を変更」ボタンを隠す */
-  body.mode-selecting-cats #btnChangeCategories {
-    display: none !important;
-  }
-
   #btnChangeCategories {
-    display: none !important; /* モバイルではドロワーメニューに集約しヘッダーを常に1行に保つ */
+    display: none !important;
   }
 
   html, body {
@@ -2143,13 +2201,12 @@
         </div>
 
         <div class="start-tools">
-          <div style="display:flex;gap:8px;">
-            <button type="button" id="btnSelectAllCats" class="btn-ghost" style="font-size:0.8rem;padding:5px 12px;">全選択</button>
-            <button type="button" id="btnClearAllCats" class="btn-ghost" style="font-size:0.8rem;padding:5px 12px;">全解除</button>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button type="button" id="btnSelectAllCats" class="btn-ghost" style="font-size:0.75rem;padding:4px 9px;">全選択</button>
+            <button type="button" id="btnClearAllCats" class="btn-ghost" style="font-size:0.75rem;padding:4px 9px;">全解除</button>
+            <span id="selectedCatSummary" class="start-summary-pill">選択: 0/7</span>
           </div>
-          <div id="selectedCatSummary" style="font-size:0.88rem;font-weight:700;color:var(--accent);">
-            選択中: 0項目 (0問)
-          </div>
+          <button type="button" id="btnStartStudyTop" class="btn-start-study-top">🚀 学習を開始</button>
         </div>
 
         <div id="catSelectGrid" class="cat-select-grid"></div>
@@ -3474,18 +3531,25 @@
         grid.appendChild(card);
       });
 
-      // サマリーテキストと開始ボタンの状態
+      // サマリーテキストと開始ボタンの状態（上部・下部両方同期）
       const summaryEl = document.getElementById("selectedCatSummary");
       const startBtn = document.getElementById("btnStartStudySession");
+      const startTopBtn = document.getElementById("btnStartStudyTop");
+
+      const hasSelected = selectedCategories.size > 0;
 
       if (summaryEl) {
-        summaryEl.textContent = `選択中: ${selectedCategories.size} / ${CATEGORIES.length}項目 (${totalSelectedQuestions}問)`;
+        summaryEl.textContent = `選択: ${selectedCategories.size}/${CATEGORIES.length} (${totalSelectedQuestions}問)`;
       }
       if (startBtn) {
-        startBtn.disabled = selectedCategories.size === 0;
-        startBtn.textContent = selectedCategories.size === 0
+        startBtn.disabled = !hasSelected;
+        startBtn.textContent = !hasSelected
           ? "項目を1つ以上選択してください"
           : `🚀 選択した ${selectedCategories.size} 項目 (${totalSelectedQuestions}問) で学習を開始`;
+      }
+      if (startTopBtn) {
+        startTopBtn.disabled = !hasSelected;
+        startTopBtn.textContent = !hasSelected ? "未選択" : `🚀 開始 (${totalSelectedQuestions}問)`;
       }
     }
 
@@ -4288,6 +4352,10 @@
       const btnStartSession = document.getElementById("btnStartStudySession");
       if (btnStartSession) {
         btnStartSession.addEventListener("click", () => startStudyWithSelectedCategories());
+      }
+      const btnStartTop = document.getElementById("btnStartStudyTop");
+      if (btnStartTop) {
+        btnStartTop.addEventListener("click", () => startStudyWithSelectedCategories());
       }
 
       document.getElementById("btnOpenDataModal").addEventListener("click", () => {

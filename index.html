@@ -2114,10 +2114,24 @@
 
   
 /* =========================================================================
- * 12. 4画面完全排他 & 全画角（iPhone / iPad / Duo / PC）マルチ適応スタイル
+ * 12. 4画面完全排他 & 全画角・ブラウザバー対応マルチ適応スタイル
  * ========================================================================= */
 
-/* 画面共通の基底クラス */
+/* ルートとボディの厳格な固定（ブラウザのツールバー内側に完全一致） */
+html, body {
+  height: 100% !important;
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 4画面共通の基底クラス */
 .app-screen {
   display: flex !important;
   flex-direction: column !important;
@@ -2133,7 +2147,7 @@
   display: none !important;
 }
 
-/* スクロール可能中央ボディ（画像や選択肢） */
+/* スクロール可能中央ボディ（必要な場合のみ内部がスムーズにスクロール） */
 .screen-scroll-body {
   flex: 1 1 0px !important;
   min-height: 0 !important;
@@ -2144,11 +2158,11 @@
   box-sizing: border-box !important;
 }
 
-/* 下部固定フッター（主操作ボタン） */
+/* 下部固定フッター（ブラウザ下部バーに絶対に隠れないようセーフエリア確保） */
 .screen-footer {
   flex-shrink: 0 !important;
-  padding: 8px 12px max(8px, env(safe-area-inset-bottom)) 12px !important;
-  background: rgba(15, 23, 42, 0.96) !important;
+  padding: 6px 12px max(8px, env(safe-area-inset-bottom)) 12px !important;
+  background: rgba(15, 23, 42, 0.98) !important;
   border-top: 1px solid var(--border-subtle) !important;
   width: 100% !important;
   box-sizing: border-box !important;
@@ -2158,12 +2172,13 @@
   justify-content: center !important;
 }
 
-/* メインコンテナのアダプティブ制御（全画角適応） */
+/* メインコンテナのアダプティブ制御（iPad・Duo・iPhoneすべてで黄金比率） */
 .main-container {
-  height: calc(100dvh - 50px) !important;
-  max-width: 640px !important; /* iPad・PCでも間延びせずスマホアプリ比率を維持 */
+  height: calc(var(--app-height, 100dvh) - 44px) !important;
+  max-height: calc(var(--app-height, 100dvh) - 44px) !important;
+  max-width: 580px !important; /* iPad・PCでも美しく引き締まるアプリ幅 */
   margin: 0 auto !important;
-  padding: 4px 6px max(4px, env(safe-area-inset-bottom)) 6px !important;
+  padding: 2px 6px 4px 6px !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -2177,85 +2192,144 @@
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
-  border-radius: 12px !important;
+  border-radius: 10px !important;
   background: var(--bg-surface) !important;
   border: 1px solid var(--border-subtle) !important;
   box-sizing: border-box !important;
 }
 
-/* 画面①: 学習項目選択画面 */
+/* アプリヘッダー（高さ42pxで常にスッキリ1行） */
+.app-header {
+  height: 42px !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  z-index: 50 !important;
+}
+
+.header-inner {
+  height: 100% !important;
+  padding: 2px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.brand {
+  gap: 6px !important;
+}
+
+.brand-icon {
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 13px !important;
+  border-radius: 6px !important;
+}
+
+.brand-title {
+  font-size: 0.9rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 170px !important;
+}
+
+.brand-sub {
+  display: none !important;
+}
+
+/* =========================================================================
+   画面①: 学習項目選択画面 (screenCatSelect)
+   ========================================================================= */
 #screenCatSelect .screen-header {
-  padding: 10px 12px 6px 12px;
-  flex-shrink: 0;
+  padding: 8px 10px 4px 10px !important;
+  flex-shrink: 0 !important;
   text-align: center;
 }
 
 #screenCatSelect .start-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  margin-bottom: 2px;
+  font-size: 0.98rem !important;
+  font-weight: 800 !important;
+  margin-bottom: 2px !important;
 }
 
 #screenCatSelect .start-tools {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px 8px 12px;
-  flex-shrink: 0;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 2px 10px 6px 10px !important;
+  flex-shrink: 0 !important;
 }
 
 #screenCatSelect .screen-scroll-body {
-  padding: 4px 10px;
-  gap: 5px;
+  padding: 2px 8px !important;
+  gap: 4px !important;
 }
 
 #screenCatSelect .cat-select-card {
-  padding: 8px 12px;
-  min-height: 42px;
-  border-radius: 8px;
-  gap: 10px;
-  flex-shrink: 0;
+  padding: 6px 10px !important;
+  min-height: 38px !important;
+  border-radius: 7px !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
 }
 
-/* 画面②: 問題画面 */
+#screenCatSelect .cat-select-name {
+  font-size: 0.82rem !important;
+  margin-bottom: 1px !important;
+}
+
+#screenCatSelect .cat-select-meta {
+  font-size: 0.67rem !important;
+}
+
+/* =========================================================================
+   画面②: 問題画面 (screenQuestion) - 500pxの画面でも確実に1画面に収まる黄金比
+   ========================================================================= */
 #screenQuestion .quiz-topbar,
 #screenExplanation .quiz-topbar,
 #screenRating .quiz-topbar {
-  padding: 7px 10px;
-  flex-shrink: 0;
-  background: rgba(15, 23, 42, 0.7);
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 5px 8px !important;
+  min-height: 32px !important;
+  flex-shrink: 0 !important;
+  background: rgba(15, 23, 42, 0.7) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.cat-badge, .type-badge, .step-badge, .srs-badge {
+  padding: 1px 7px !important;
+  font-size: 0.72rem !important;
 }
 
 #screenQuestion .screen-scroll-body {
-  padding: 10px 10px 6px 10px;
-  gap: 8px;
+  padding: 6px 8px 4px 8px !important;
+  gap: 4px !important;
 }
 
 #screenQuestion .question-title {
-  font-size: 0.98rem;
-  line-height: 1.4;
-  margin-bottom: 4px;
+  font-size: 0.92rem !important;
+  line-height: 1.35 !important;
+  margin-bottom: 2px !important;
 }
 
-/* ビジュアルステージ: 画面の高さに応じて流動的に伸縮（高さを占拠しない） */
+/* 画像ステージ: 高さを抑えて選択肢とボタンの領域を最大確保 */
 .visual-stage {
-  height: clamp(120px, 24vh, 220px) !important;
-  min-height: 120px !important;
-  max-height: 220px !important;
-  margin-bottom: 6px !important;
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #020617;
-  border: 1px solid var(--border-subtle);
+  height: clamp(85px, 16vh, 125px) !important;
+  min-height: 85px !important;
+  max-height: 125px !important;
+  margin-bottom: 4px !important;
+  position: relative !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #020617 !important;
+  border: 1px solid var(--border-subtle) !important;
+  flex-shrink: 0 !important;
 }
 
 .visual-stage img, .visual-stage svg {
@@ -2264,135 +2338,151 @@
   object-fit: contain !important;
 }
 
-/* 回答ヘッダー */
-.answer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
-  gap: 6px;
+.visual-tools {
+  bottom: 4px !important;
+  right: 4px !important;
+  gap: 4px !important;
 }
 
+.visual-tool-btn {
+  padding: 2px 7px !important;
+  font-size: 0.68rem !important;
+}
+
+/* 指示文はスマホでは省略（バッジに形式記載済み） */
 .answer-instruction {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-sub);
+  display: none !important;
 }
 
-/* 電力会社ボタングリッド */
+.answer-header {
+  margin-bottom: 2px !important;
+}
+
+/* 電力会社10社グリッド（2列×5行を極小パディングでコンパクト化） */
 .power-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
-  margin-bottom: 6px;
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 4px !important;
+  margin-bottom: 2px !important;
 }
 
 .power-btn {
-  padding: 8px 6px;
-  min-height: 42px;
-  font-size: 0.84rem;
-  border-radius: 6px;
+  padding: 5px 4px !important;
+  min-height: 33px !important;
+  font-size: 0.8rem !important;
+  border-radius: 5px !important;
 }
 
-/* 画面③: 正解・解説画面 */
+/* 都道府県アコーディオン */
+.region-accordion {
+  margin-bottom: 4px !important;
+}
+
+.region-header {
+  padding: 6px 8px !important;
+  font-size: 0.82rem !important;
+}
+
+.pref-badge {
+  padding: 4px 8px !important;
+  font-size: 0.78rem !important;
+}
+
+/* 操作ボタン */
+.btn-submit, .btn-proceed, .btn-start-study {
+  width: 100% !important;
+  padding: 10px 14px !important;
+  font-size: 0.94rem !important;
+  font-weight: 800 !important;
+  border-radius: 7px !important;
+  min-height: 42px !important;
+}
+
+/* =========================================================================
+   画面③: 正解と解説画面 (screenExplanation)
+   ========================================================================= */
 #screenExplanation .screen-scroll-body {
-  padding: 12px 10px;
-  gap: 12px;
+  padding: 8px 10px !important;
+  gap: 8px !important;
 }
 
 #screenExplanation .result-banner {
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 8px 10px !important;
+  border-radius: 6px !important;
 }
 
 #screenExplanation .result-verdict {
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
 }
 
-/* 画面④: 復習評価画面 */
+#screenExplanation .explanation-box {
+  padding: 8px 10px !important;
+  font-size: 0.82rem !important;
+  line-height: 1.45 !important;
+}
+
+/* =========================================================================
+   画面④: 復習度評価画面 (screenRating)
+   ========================================================================= */
 #screenRating .screen-scroll-body {
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
+  padding: 12px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
 }
 
 #screenRating .rating-prompt-card {
   text-align: center;
-  max-width: 500px;
+  max-width: 440px;
 }
 
 #screenRating .rating-prompt-icon {
-  font-size: 2.2rem;
-  margin-bottom: 4px;
+  font-size: 1.8rem !important;
+  margin-bottom: 2px !important;
 }
 
 #screenRating .rating-prompt-title {
-  font-size: 1.15rem;
-  font-weight: 800;
-  margin-bottom: 4px;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  margin-bottom: 2px !important;
 }
 
 #screenRating .rating-prompt-sub {
-  font-size: 0.82rem;
-  color: var(--text-sub);
+  font-size: 0.78rem !important;
+  color: var(--text-sub) !important;
 }
 
 #screenRating .rating-big-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  width: 100%;
-  max-width: 480px;
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 8px !important;
+  width: 100% !important;
+  max-width: 420px !important;
 }
 
 #screenRating .anki-btn {
-  padding: 14px 8px;
-  min-height: 78px;
-  border-radius: 8px;
+  padding: 10px 6px !important;
+  min-height: 64px !important;
+  border-radius: 7px !important;
 }
 
 #screenRating .anki-title {
-  font-size: 1.05rem;
+  font-size: 0.98rem !important;
 }
 
 #screenRating .anki-interval {
-  font-size: 0.82rem;
+  font-size: 0.78rem !important;
 }
 
-/* ヘッダーの完全1行固定 */
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  height: 46px;
-}
-
-.header-inner {
-  height: 100%;
-  padding: 4px 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-}
-
-.brand-title {
-  font-size: 0.95rem !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  max-width: 180px !important;
-}
-
-/* デスクトップ・タブレット大画面時のサイドバー非表示 */
+/* デスクトップ用サイドバー非表示 */
 aside.sidebar {
   display: none !important;
 }
 
-  </style>
+</style>
 </head>
 <body>
   <header class="app-header">
@@ -4792,6 +4882,24 @@ aside.sidebar {
     }
 
     // 初期化実行
+    
+    /* =========================================================================
+     * ブラウザ上下バー（アドレスバー・下部ツールバー）考慮の真の可視領域自動測定
+     * ========================================================================= */
+    function updateAppHeight() {
+      const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      const root = document.documentElement || document.body;
+      if (root && root.style && typeof root.style.setProperty === 'function') {
+        root.style.setProperty('--app-height', `${h}px`);
+      }
+    }
+    window.addEventListener('resize', updateAppHeight);
+    window.addEventListener('orientationchange', updateAppHeight);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateAppHeight);
+    }
+    updateAppHeight();
+
     setupEventListeners();
     updateDashboardStats();
     showCategorySelectScreen();

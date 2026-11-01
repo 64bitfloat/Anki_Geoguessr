@@ -1778,6 +1778,130 @@
   
 /* モバイル表示時のスクロール不要（No-Scroll 100dvh）最適化 */
 @media (max-width: 768px) {
+
+  /* スタート画面（カテゴリ選択）の一画面・No-Scroll 最適化 */
+  .start-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 10px 10px 8px 10px;
+    border-radius: 10px;
+  }
+
+  .start-header {
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+
+  .start-title {
+    font-size: 1.05rem;
+    margin-bottom: 2px;
+  }
+
+  .start-desc {
+    font-size: 0.72rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .start-tools {
+    margin-bottom: 6px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .start-tools .btn-ghost {
+    padding: 4px 10px;
+    font-size: 0.74rem;
+    border-radius: 6px;
+  }
+
+  #selectedCatSummary {
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .cat-select-grid {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 6px;
+    padding-right: 2px;
+  }
+
+  .cat-select-card {
+    padding: 6px 10px;
+    min-height: 42px;
+    border-radius: 8px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .cat-select-checkbox {
+    width: 17px;
+    height: 17px;
+  }
+
+  .cat-select-name {
+    font-size: 0.84rem;
+    margin-bottom: 1px;
+  }
+
+  .cat-select-meta {
+    font-size: 0.68rem;
+  }
+
+  .start-footer {
+    flex-shrink: 0;
+    padding-top: 6px;
+    border-top: 1px solid var(--border-subtle);
+    width: 100%;
+    margin-top: auto;
+  }
+
+  .btn-start-study {
+    width: 100%;
+    padding: 11px;
+    font-size: 0.94rem;
+    font-weight: 800;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
+  }
+
+  /* ヘッダーの折り返し防止・スリム化（高さ約44px） */
+  .header-inner {
+    padding: 6px 10px !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .header-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* スタート画面表示中はヘッダーの「学習項目を変更」ボタンを隠す */
+  body.mode-selecting-cats #btnChangeCategories {
+    display: none !important;
+  }
+
+  #btnChangeCategories {
+    display: none !important; /* モバイルではドロワーメニューに集約しヘッダーを常に1行に保つ */
+  }
+
   html, body {
     height: 100%;
     overflow: hidden;
@@ -2012,7 +2136,7 @@
     <!-- Main Quiz Column -->
     <section class="quiz-panel" aria-live="polite">
       <!-- Category Selection Start Screen -->
-      <div id="categorySelectScreen" class="start-panel">
+      <div id="categorySelectScreen" class="start-panel" style="display:flex;">
         <div class="start-header">
           <div class="start-title">🎯 学習する視覚メタ項目を選択</div>
           <div class="start-desc">集中して覚えたい項目を選択して「学習を開始」を押してください（複数選択・1項目のみどちらも可能）。</div>
@@ -3302,7 +3426,8 @@
       const activeView = document.getElementById("quizActiveView");
       const completeView = document.getElementById("quizCompleteView");
 
-      if (selectScreen) selectScreen.style.display = "block";
+      document.body.classList.add("mode-selecting-cats");
+      if (selectScreen) selectScreen.style.display = "flex";
       if (activeView) activeView.style.display = "none";
       if (completeView) completeView.classList.remove("visible");
 
@@ -3370,6 +3495,7 @@
         return;
       }
 
+      document.body.classList.remove("mode-selecting-cats");
       saveSelectedCategories();
 
       const selectScreen = document.getElementById("categorySelectScreen");

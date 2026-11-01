@@ -3861,12 +3861,7 @@ aside.sidebar {
         return;
       }
 
-      document.body.classList.remove("mode-selecting-cats");
       saveSelectedCategories();
-
-      const selectScreen = document.getElementById("categorySelectScreen");
-      if (selectScreen) selectScreen.style.display = "none";
-
       activeCategoryFilter = null;
       buildStudyQueue();
       loadNextQuestion();
@@ -3875,26 +3870,23 @@ aside.sidebar {
     function loadNextQuestion() {
       updateDashboardStats();
 
-      const activeView = document.getElementById("quizActiveView");
-      const completeView = document.getElementById("quizCompleteView");
       const clearFilterBtn = document.getElementById("btnClearCatFilter");
 
       if (studyQueue.length === 0) {
         currentQuestion = null;
         setActiveScreen("complete");
-        clearFilterBtn.style.display = activeCategoryFilter ? "inline-flex" : "none";
+        if (clearFilterBtn) clearFilterBtn.style.display = activeCategoryFilter ? "inline-flex" : "none";
 
         const msgEl = document.getElementById("completeMessage");
-        if (studyMode === "weak") {
-          msgEl.textContent = "現在、誤答履歴やAgain評価のある苦手問題はありません。全問演習モードでさらなる定着を図りましょう！";
-        } else {
-          msgEl.textContent = "現在の条件における未学習・復習期限到来カードをすべて消化しました。全問演習モードまたは別カテゴリで継続学習できます。";
+        if (msgEl) {
+          if (studyMode === "weak") {
+            msgEl.textContent = "現在、誤答履歴やAgain評価のある苦手問題はありません。全問演習モードでさらなる定着を図りましょう！";
+          } else {
+            msgEl.textContent = "現在の条件における未学習・復習期限到来カードをすべて消化しました。全問演習モードまたは別カテゴリで継続学習できます。";
+          }
         }
         return;
       }
-
-      activeView.style.display = "block";
-      completeView.classList.remove("visible");
 
       currentQuestion = studyQueue[0];
       quizPhase = "answering";
@@ -3903,6 +3895,7 @@ aside.sidebar {
       openRegions.clear();
 
       renderCurrentQuestion();
+      setQuizStep("question");
       updateDashboardStats();
     }
 
@@ -3970,8 +3963,6 @@ aside.sidebar {
         extImg.src = q.imageUrl;
       }
 
-      // 3ステップ初期化: ステップ1（問題画面）へリセット
-      setQuizStep("question");
       document.getElementById("diffLegend").classList.remove("visible");
 
       // 回答入力UIの切替
@@ -4183,16 +4174,6 @@ aside.sidebar {
       renderCategorySelectGrid();
     }
 
-    function startStudyWithSelectedCategories() {
-      if (selectedCategories.size === 0) {
-        showToast("⚠️ 学習項目を1つ以上選択してください");
-        return;
-      }
-      saveSelectedCategories();
-      activeCategoryFilter = null;
-      buildStudyQueue();
-      loadNextQuestion();
-    }
 
     function setQuizStep(step) {
       if (step === "question") {
@@ -4236,7 +4217,8 @@ aside.sidebar {
 
         const recommendedRating = isCorrect ? "good" : "again";
         document.querySelectorAll("#screenRating .anki-btn").forEach((btn) => {
-          btn.classList.toggle("recommended-anki", btn.dataset.rating === recommendedRating);
+          const r = btn.dataset?.rating || btn.getAttribute("data-rating");
+          btn.classList.toggle("recommended-anki", r === recommendedRating);
         });
 
         setActiveScreen("rating");

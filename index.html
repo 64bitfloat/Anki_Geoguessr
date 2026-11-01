@@ -2583,8 +2583,11 @@ aside.sidebar {
 
         <div id="catSelectGrid" class="screen-scroll-body"></div>
 
-        <div class="screen-footer">
-          <button type="button" id="btnStartStudySession" class="btn-start-study">🚀 選択した項目で学習を開始</button>
+        <div class="screen-footer" style="flex-direction:column;gap:6px;">
+          <button type="button" id="btnStartStudySession" class="btn-start-study">🚀 通常学習を開始（ノルマ優先）</button>
+          <button type="button" id="btnStartPracticeDirect" class="btn-ghost" style="width:100%;padding:8px;font-size:0.82rem;color:#7dd3fc;border-color:rgba(56,189,248,0.4);border-radius:7px;">
+            🔁 全問練習モードで開始（復習期日は保護されます）
+          </button>
         </div>
       </div>
 
@@ -2740,17 +2743,43 @@ aside.sidebar {
         </div>
       </div>
 
-<!-- Queue Completed Screen -->
-      <div id="quizCompleteView" class="complete-state">
-        <div class="complete-icon">🎯</div>
-        <h2 style="font-size:1.35rem;margin-bottom:8px;">現在の学習キューを完了しました！</h2>
-        <p id="completeMessage" style="color:var(--text-sub);font-size:0.92rem;max-width:520px;margin:0 auto;">
-          期限到来の復習カードと新規カードの学習が一通り完了しました。引き続き全問演習や苦手特訓で知識を定着させましょう。
-        </p>
-        <div class="complete-actions">
-          <button type="button" id="btnContinueAll" class="btn-submit" style="width:auto;padding:11px 22px;">全問演習モードで続ける</button>
-          <button type="button" id="btnContinueWeak" class="btn-ghost" style="padding:11px 18px;">苦手問題だけ復習する</button>
-          <button type="button" id="btnClearCatFilter" class="btn-ghost" style="padding:11px 18px;display:none;">カテゴリ絞り込みを解除</button>
+<!-- ===================================================================
+           画面⑤: 全問完了画面 (screenComplete)
+           =================================================================== -->
+      <div id="screenComplete" class="app-screen hidden">
+        <div class="quiz-topbar">
+          <div class="badge-group">
+            <span class="cat-badge" style="background:rgba(16,185,129,0.18);color:#34d399;border-color:rgba(16,185,129,0.4);">
+              🎉 学習完了
+            </span>
+          </div>
+          <div class="badge-group">
+            <span class="srs-badge">セッション完了</span>
+          </div>
+        </div>
+
+        <div class="screen-scroll-body" style="align-items:center;justify-content:center;text-align:center;padding:24px 16px;gap:12px;">
+          <div style="font-size:2.8rem;line-height:1;">🎯</div>
+          <h2 style="font-size:1.25rem;font-weight:800;color:var(--text-main);margin:0;">学習ノルマを完了しました！</h2>
+          <p id="completeMessage" style="font-size:0.86rem;color:var(--text-sub);max-width:440px;line-height:1.5;margin:0 auto;">
+            選択した項目の出題可能な問題（期限到来復習カード＋新規カード）をすべて消化しました！
+          </p>
+
+          <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+            <!-- 要件②: 復習期日を上書きしない全問練習モード -->
+            <button type="button" id="btnStartPracticeMode" class="btn-submit" style="background:linear-gradient(135deg,#0284c7,#0ea5e9);">
+              <span>🔁 全問練習モード（間隔保護・無制限）</span>
+            </button>
+
+            <!-- 要件①: 学習項目（範囲）選択に戻る -->
+            <button type="button" id="btnBackToCatSelect" class="btn-ghost" style="padding:11px;font-size:0.92rem;font-weight:700;border-color:var(--border);">
+              <span>📚 学習項目（範囲）を選択し直す</span>
+            </button>
+          </div>
+
+          <div style="font-size:0.73rem;color:var(--text-muted);margin-top:6px;max-width:340px;line-height:1.4;">
+            ※「全問練習モード」では、何問解いても本番の復習予定日（推奨評価）は上書きされず安全に保護されます。心ゆくまで反復練習できます。
+          </div>
         </div>
       </div>
     </section>
@@ -3834,7 +3863,8 @@ aside.sidebar {
       const now = Date.now();
       const pool = getFilteredPool();
 
-      if (studyMode === "all") {
+      if (studyMode === "practice" || studyMode === "all") {
+        // 全問練習モード: 復習期日に関係なく、選択カテゴリの全問題をシャッフル出題
         studyQueue = shuffleArray(pool);
       } else if (studyMode === "weak") {
         const weakCards = pool.filter((q) => {
@@ -3867,22 +3897,6 @@ aside.sidebar {
     }
 
     
-    /* =========================================================================
-     * カテゴリ選択スタート画面制御
-     * ========================================================================= */
-    function showCategorySelectScreen() {
-      const selectScreen = document.getElementById("categorySelectScreen");
-      const activeView = document.getElementById("quizActiveView");
-      const completeView = document.getElementById("quizCompleteView");
-
-      document.body.classList.add("mode-selecting-cats");
-      if (selectScreen) selectScreen.style.display = "flex";
-      if (activeView) activeView.style.display = "none";
-      if (completeView) completeView.classList.remove("visible");
-
-      renderCategorySelectGrid();
-    }
-
     function renderCategorySelectGrid() {
       const grid = document.getElementById("catSelectGrid");
       if (!grid) return;
@@ -4005,14 +4019,24 @@ aside.sidebar {
 
       const srsBadge = document.getElementById("qSrsBadge");
       srsBadge.classList.remove("weak");
-      if (rec.attemptTotal === 0) {
-        srsBadge.textContent = "新規";
-      } else if (rec.lapses >= 2 || rec.lastRating === "again") {
-        srsBadge.textContent = `要強化 (誤答:${rec.lapses})`;
-        srsBadge.classList.add("weak");
+      if (studyMode === "practice") {
+        srsBadge.textContent = "🛡️ 練習中 (間隔保護)";
+        srsBadge.style.background = "rgba(14,165,233,0.2)";
+        srsBadge.style.color = "#38bdf8";
+        srsBadge.style.borderColor = "rgba(56,189,248,0.4)";
       } else {
-        const rate = Math.round((rec.correctTotal / rec.attemptTotal) * 100);
-        srsBadge.textContent = `正答率 ${rate}% (${rec.correctTotal}/${rec.attemptTotal})`;
+        srsBadge.style.background = "";
+        srsBadge.style.color = "";
+        srsBadge.style.borderColor = "";
+        if (rec.attemptTotal === 0) {
+          srsBadge.textContent = "新規";
+        } else if (rec.lapses >= 2 || rec.lastRating === "again") {
+          srsBadge.textContent = `要強化 (誤答:${rec.lapses})`;
+          srsBadge.classList.add("weak");
+        } else {
+          const rate = Math.round((rec.correctTotal / rec.attemptTotal) * 100);
+          srsBadge.textContent = `正答率 ${rate}% (${rec.correctTotal}/${rec.attemptTotal})`;
+        }
       }
 
       // 問題文
@@ -4239,7 +4263,7 @@ aside.sidebar {
         question: document.getElementById("screenQuestion"),
         explanation: document.getElementById("screenExplanation"),
         rating: document.getElementById("screenRating"),
-        complete: document.getElementById("quizCompleteView")
+        complete: document.getElementById("screenComplete")
       };
 
       Object.entries(screens).forEach(([key, el]) => {
@@ -4298,11 +4322,11 @@ aside.sidebar {
         if (isCorrect) {
           iconEl.textContent = "🎉";
           titleEl.textContent = "ナイス正解！定着度を選択してください";
-          subEl.innerHTML = "推奨評価 <strong>[Good]</strong> がハイライトされています。<kbd>Space</kbd> で選択して次の問題へ進みます。";
+          subEl.innerHTML = studyMode === "practice" ? "全問練習モード中（<strong>本番の復習期日は保護されます</strong>）。<kbd>Space</kbd> で次へ進みます。" : "推奨評価 <strong>[Good]</strong> がハイライトされています。<kbd>Space</kbd> で選択して次の問題へ進みます。";
         } else {
           iconEl.textContent = "💡";
           titleEl.textContent = "惜しい！再学習間隔を選択してください";
-          subEl.innerHTML = "推奨評価 <strong>[Again]</strong> がハイライトされています。<kbd>Space</kbd> で選択して復習キューに入れます。";
+          subEl.innerHTML = studyMode === "practice" ? "全問練習モード中（<strong>本番の復習期日は保護されます</strong>）。<kbd>Space</kbd> で演習キューに入れます。" : "推奨評価 <strong>[Again]</strong> がハイライトされています。<kbd>Space</kbd> で選択して復習キューに入れます。";
         }
 
         const recommendedRating = isCorrect ? "good" : "again";
@@ -4420,6 +4444,17 @@ aside.sidebar {
 
       // 現在の先頭問題を取り出す
       studyQueue.shift();
+
+      // ★要件②: 全問練習モード時は本番のSRS復習期日・評価を100%保護（上書きしない）
+      if (studyMode === "practice") {
+        if (rating === "again") {
+          // 演習セッション内ですぐ解き直せるようキューの後方へ再挿入
+          const reinsertIdx = Math.min(studyQueue.length, 3);
+          studyQueue.splice(reinsertIdx, 0, q);
+        }
+        loadNextQuestion();
+        return;
+      }
 
       if (rating === "again") {
         rec.reps = 0;
@@ -4593,28 +4628,34 @@ aside.sidebar {
         loadNextQuestion();
       });
 
-      // 完了画面からの再開ボタン
-      document.getElementById("btnContinueAll").addEventListener("click", () => {
-        studyMode = "all";
-        modeSelect.value = "all";
-        buildStudyQueue();
-        loadNextQuestion();
-      });
+      // 完了画面からの再開ボタン（旧IDがある場合の安全ガード）
+      const btnContAll = document.getElementById("btnContinueAll");
+      if (btnContAll) {
+        btnContAll.addEventListener("click", () => {
+          studyMode = "practice";
+          buildStudyQueue();
+          loadNextQuestion();
+        });
+      }
 
-      document.getElementById("btnContinueWeak").addEventListener("click", () => {
-        studyMode = "weak";
-        modeSelect.value = "weak";
-        buildStudyQueue();
-        loadNextQuestion();
-      });
+      const btnContWeak = document.getElementById("btnContinueWeak");
+      if (btnContWeak) {
+        btnContWeak.addEventListener("click", () => {
+          studyMode = "weak";
+          buildStudyQueue();
+          loadNextQuestion();
+        });
+      }
 
-      document.getElementById("btnClearCatFilter").addEventListener("click", () => {
+      const btnClr = document.getElementById("btnClearCatFilter");
+      if (btnClr) btnClr.addEventListener("click", () => {
         activeCategoryFilter = null;
         buildStudyQueue();
         loadNextQuestion();
       });
 
-      document.getElementById("btnResetCatFilter").addEventListener("click", () => {
+      const btnRst = document.getElementById("btnResetCatFilter");
+      if (btnRst) btnRst.addEventListener("click", () => {
         activeCategoryFilter = null;
         buildStudyQueue();
         loadNextQuestion();
@@ -4766,6 +4807,51 @@ aside.sidebar {
       if (btnStartSession) {
         btnStartSession.addEventListener("click", () => startStudyWithSelectedCategories());
       }
+      // 要件①: 完了画面から「範囲選択に戻る」ボタン
+      const btnBackCats = document.getElementById("btnBackToCatSelect");
+      if (btnBackCats) {
+        btnBackCats.addEventListener("click", () => {
+          showCategorySelectScreen();
+        });
+      }
+
+      // 要件②: 完了画面から「全問練習モード（間隔保護）」開始ボタン
+      const btnStartPractice = document.getElementById("btnStartPracticeMode");
+      if (btnStartPractice) {
+        btnStartPractice.addEventListener("click", () => {
+          studyMode = "practice";
+          buildStudyQueue();
+          loadNextQuestion();
+          showToast("🛡️ 全問練習モードを開始しました（復習期日は保護されます）");
+        });
+      }
+
+      // 画面①から直接「全問練習モード」開始ボタン
+      const btnPracticeDirect = document.getElementById("btnStartPracticeDirect");
+      if (btnPracticeDirect) {
+        btnPracticeDirect.addEventListener("click", () => {
+          if (selectedCategories.size === 0) {
+            showToast("⚠️ 学習項目を1つ以上選択してください");
+            return;
+          }
+          saveSelectedCategories();
+          studyMode = "practice";
+          activeCategoryFilter = null;
+          buildStudyQueue();
+          loadNextQuestion();
+          showToast("🛡️ 全問練習モードを開始しました（復習期日は保護されます）");
+        });
+      }
+
+      // 通常学習開始ボタン（studyMode を "due" にリセット）
+      const btnStartNormal = document.getElementById("btnStartStudySession");
+      if (btnStartNormal) {
+        btnStartNormal.addEventListener("click", () => {
+          studyMode = "due";
+          startStudyWithSelectedCategories();
+        });
+      }
+      
       const btnStartTop = document.getElementById("btnStartStudyTop");
       if (btnStartTop) {
         btnStartTop.addEventListener("click", () => startStudyWithSelectedCategories());

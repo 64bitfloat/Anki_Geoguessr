@@ -2144,8 +2144,15 @@
   box-sizing: border-box !important;
 }
 
-/* 非表示画面は絶対消去 */
-.app-screen.hidden {
+/* 非表示画面・非表示要素は絶対消去 */
+.app-screen.hidden,
+.hidden,
+#typeAContainer.hidden,
+#typeBContainer.hidden,
+#typeAContainer[style*="display: none"],
+#typeAContainer[style*="display:none"],
+#typeBContainer[style*="display: none"],
+#typeBContainer[style*="display:none"] {
   display: none !important;
 }
 
@@ -2388,7 +2395,7 @@
   }
 
   .power-grid {
-    display: grid !important;
+    display: grid;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 4px !important;
     margin-bottom: 2px !important;
@@ -2725,7 +2732,7 @@
 
   /* 電力会社ボタン（PCでは広々3〜4列） */
   .power-grid {
-    display: grid !important;
+    display: grid;
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 10px !important;
     margin-bottom: 16px !important;
@@ -4430,13 +4437,19 @@
         instructionEl.textContent = "該当する電力会社を1つ選択して「回答する」を押してください。";
         prefQuickTools.style.display = "none";
         typeBContainer.style.display = "none";
+        typeBContainer.classList.add("hidden");
+        typeBContainer.innerHTML = "";
         typeAContainer.style.display = "grid";
+        typeAContainer.classList.remove("hidden");
         renderTypeAPowerGrid();
       } else {
         instructionEl.textContent = "該当する都道府県をすべて選択してください（過不足なしの完全一致で正解）。";
         prefQuickTools.style.display = "flex";
         typeAContainer.style.display = "none";
+        typeAContainer.classList.add("hidden");
+        typeAContainer.innerHTML = "";
         typeBContainer.style.display = "flex";
+        typeBContainer.classList.remove("hidden");
         renderTypeBRegionsAccordion();
       }
     }
@@ -4759,6 +4772,9 @@
 
       // 都道府県問題の場合は、選択県または正解県が含まれる地方を自動展開して色分けを即座に可視化
       if (q.targetType === "prefecture") {
+        typeAContainer.style.display = "none";
+        typeAContainer.classList.add("hidden");
+        typeAContainer.innerHTML = "";
         REGIONS.forEach((region) => {
           const hasRelevant = region.prefs.some((p) => selectedAnswers.has(p) || correctSet.has(p));
           if (hasRelevant) openRegions.add(region.name);
@@ -4766,6 +4782,9 @@
         document.getElementById("diffLegend").classList.add("visible");
         renderTypeBRegionsAccordion();
       } else {
+        typeBContainer.style.display = "none";
+        typeBContainer.classList.add("hidden");
+        typeBContainer.innerHTML = "";
         renderTypeAPowerGrid();
       }
 
